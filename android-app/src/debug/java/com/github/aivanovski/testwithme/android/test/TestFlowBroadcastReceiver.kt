@@ -7,7 +7,6 @@ import arrow.core.raise.either
 import com.github.aivanovski.testwithme.android.di.GlobalInjector
 import com.github.aivanovski.testwithme.android.domain.FlowInteractor
 import com.github.aivanovski.testwithme.android.entity.exception.AppException
-import com.github.aivanovski.testwithme.android.extensions.unwrapError
 import com.github.aivanovski.testwithme.android.utils.Base64Utils
 import com.github.aivanovski.testwithme.android.utils.StringUtils
 import kotlinx.coroutines.CoroutineScope
@@ -15,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import arrow.core.Either
+import com.github.aivanovski.testwithme.extensions.unwrapError
 
 class TestFlowBroadcastReceiver : BroadcastReceiver() {
 

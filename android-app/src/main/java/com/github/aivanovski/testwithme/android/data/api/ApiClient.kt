@@ -10,10 +10,8 @@ import com.github.aivanovski.testwithme.android.entity.exception.InvalidHttpStat
 import com.github.aivanovski.testwithme.web.api.request.LoginRequest
 import com.github.aivanovski.testwithme.web.api.response.FlowResponse
 import com.github.aivanovski.testwithme.web.api.response.LoginResponse
-import io.ktor.client.HttpClient
-import io.ktor.client.request.get
+import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.headers
-import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
@@ -26,7 +24,7 @@ import kotlinx.serialization.json.Json
 import timber.log.Timber
 
 class ApiClient(
-    private val httpClient: HttpClient,
+    private val httpClient: HttpRequestExecutor,
     private val settings: Settings
 ) {
 
@@ -37,10 +35,10 @@ class ApiClient(
         parseJson<FlowResponse>(body).bind()
     }
 
-    suspend fun get(url: String): Either<ApiException, String> = either {
+    private suspend fun get(url: String): Either<ApiException, String> = either {
         // Get token if necessary
-        var token = if (settings.authToken == null) {
-            val response = login().bind()
+        val token = if (settings.authToken == null) {
+            val response = login("admin", "abc123").bind() // TODO: fix
 
             response.token
         } else {
@@ -49,13 +47,15 @@ class ApiClient(
 
         settings.authToken = token
 
-        // Do request
-        val response = httpClient.get(url) {
+        val builder: HttpRequestBuilder.() -> Unit = {
             headers {
                 append(HttpHeaders.Authorization, "Bearer $token")
             }
             contentType(ContentType.Application.Json)
         }
+
+        // Do request
+        val response = httpClient.get(url, block = builder).bind()
 
         if (response.status == HttpStatusCode.OK) {
             return@either response.bodyAsText()
@@ -63,41 +63,38 @@ class ApiClient(
 
         // Authenticate was unsuccessful, retry request
         if (response.status == HttpStatusCode.Unauthorized) {
-            val loginResponse = login().bind()
+            val loginResponse = login("admin", "abc123").bind() // TODO: fix
 
-            token = loginResponse.token
-            settings.authToken = token
+            settings.authToken = loginResponse.token
 
             // Do request
-            val retryResponse = httpClient.get(url) {
-                headers {
-                    append(HttpHeaders.Authorization, "Bearer $token")
-                }
-                contentType(ContentType.Application.Json)
-            }
+            val retryResponse = httpClient.get(url, block = builder).bind()
 
-            if (retryResponse.status == HttpStatusCode.OK) {
-                retryResponse.bodyAsText()
-            } else {
+            if (retryResponse.status != HttpStatusCode.OK) {
                 raise(InvalidHttpStatusCodeException(response.status))
             }
+
+            retryResponse.bodyAsText()
         } else {
             raise(InvalidHttpStatusCodeException(response.status))
         }
     }
 
-    suspend fun login(): Either<ApiException, LoginResponse> = either {
+    suspend fun login(
+        username: String,
+        password: String
+    ): Either<ApiException, LoginResponse> = either {
         val body = Json.encodeToString(
             LoginRequest(
-                username = "admin",
-                password = "abc123"
+                username = username,
+                password = password
             )
         )
 
         val response = httpClient.post(buildLoginUrl()) {
             contentType(ContentType.Application.Json)
             setBody(body)
-        }
+        }.bind()
 
         if (response.status != HttpStatusCode.OK) {
             raise(InvalidHttpStatusCodeException(response.status))

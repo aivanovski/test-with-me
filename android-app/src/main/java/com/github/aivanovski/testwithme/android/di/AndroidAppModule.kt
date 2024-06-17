@@ -5,6 +5,7 @@ import com.github.aivanovski.testwithme.android.data.repository.FlowRepositoryIm
 import com.github.aivanovski.testwithme.android.data.Settings
 import com.github.aivanovski.testwithme.android.data.SettingsImpl
 import com.github.aivanovski.testwithme.android.data.api.ApiClient
+import com.github.aivanovski.testwithme.android.data.api.HttpRequestExecutor
 import com.github.aivanovski.testwithme.android.data.db.AppDatabase
 import com.github.aivanovski.testwithme.android.data.db.dao.ExecutionDataDao
 import com.github.aivanovski.testwithme.android.data.db.dao.FlowEntryDao
@@ -12,9 +13,14 @@ import com.github.aivanovski.testwithme.android.data.db.dao.JobDao
 import com.github.aivanovski.testwithme.android.data.db.dao.StepEntryDao
 import com.github.aivanovski.testwithme.android.data.repository.ExecutionDataRepository
 import com.github.aivanovski.testwithme.android.data.repository.JobRepository
+import com.github.aivanovski.testwithme.android.domain.ErrorInteractor
 import com.github.aivanovski.testwithme.android.domain.FlowInteractor
+import com.github.aivanovski.testwithme.android.domain.resources.ResourceProvider
+import com.github.aivanovski.testwithme.android.domain.resources.ResourceProviderImpl
 import com.github.aivanovski.testwithme.android.domain.usecases.GetCurrentJobUseCase
 import com.github.aivanovski.testwithme.android.domain.usecases.ParseFlowFileUseCase
+import com.github.aivanovski.testwithme.android.presentation.screens.login.LoginInteractor
+import com.github.aivanovski.testwithme.android.presentation.screens.login.LoginViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.logging.LogLevel
@@ -27,6 +33,7 @@ object AndroidAppModule {
 
     val module = module {
         single<Settings> { SettingsImpl(get()) }
+        single<ResourceProvider> { ResourceProviderImpl(get()) }
 
         // Database
         single { AppDatabase.buildDatabase(get()) }
@@ -36,7 +43,7 @@ object AndroidAppModule {
         single { provideExecutionEntryDao(get()) }
 
         // Network
-        single { provideHttpClient() }
+        single { provideHttpRequestExecutor() }
         single { ApiClient(get(), get()) }
 
         // Repositories
@@ -49,7 +56,12 @@ object AndroidAppModule {
         single { GetCurrentJobUseCase(get()) }
 
         // Interactors
+        single { ErrorInteractor(get()) }
         single { FlowInteractor(get(), get(), get(), get(), get(), get()) }
+        single { LoginInteractor(get()) }
+
+        // ViewModels
+        factory { LoginViewModel(get(), get()) }
     }
 
     private fun provideStepEntryDao(db: AppDatabase): StepEntryDao = db.stepEntryDao
@@ -61,16 +73,18 @@ object AndroidAppModule {
     private fun provideExecutionEntryDao(db: AppDatabase): ExecutionDataDao =
         db.executionDataDao
 
-    private fun provideHttpClient(): HttpClient {
-        return HttpClient(OkHttp) {
-            install(Logging) {
-                logger = object : Logger {
-                    override fun log(message: String) {
-                        Timber.d(message)
+    private fun provideHttpRequestExecutor(): HttpRequestExecutor {
+        return HttpRequestExecutor(
+            client = HttpClient(OkHttp) {
+                install(Logging) {
+                    logger = object : Logger {
+                        override fun log(message: String) {
+                            Timber.d(message)
+                        }
                     }
+                    level = LogLevel.BODY
                 }
-                level = LogLevel.BODY
             }
-        }
+        )
     }
 }

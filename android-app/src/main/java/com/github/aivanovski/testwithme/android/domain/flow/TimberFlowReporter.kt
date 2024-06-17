@@ -3,7 +3,7 @@ package com.github.aivanovski.testwithme.android.domain.flow
 import arrow.core.Either
 import com.github.aivanovski.testwithme.android.entity.db.FlowEntry
 import com.github.aivanovski.testwithme.android.entity.exception.AppException
-import com.github.aivanovski.testwithme.android.extensions.unwrapError
+import com.github.aivanovski.testwithme.extensions.unwrapError
 import com.github.aivanovski.testwithme.flow.commands.StepCommand
 import timber.log.Timber
 

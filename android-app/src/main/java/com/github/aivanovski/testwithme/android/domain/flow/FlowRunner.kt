@@ -11,7 +11,6 @@ import com.github.aivanovski.testwithme.android.entity.JobStatus
 import com.github.aivanovski.testwithme.android.entity.db.FlowEntry
 import com.github.aivanovski.testwithme.android.entity.db.JobEntry
 import com.github.aivanovski.testwithme.android.entity.exception.AppException
-import com.github.aivanovski.testwithme.android.extensions.unwrapError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -21,6 +20,7 @@ import timber.log.Timber
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import arrow.core.Either
+import com.github.aivanovski.testwithme.extensions.unwrapError
 
 class FlowRunner(
     private val settings: Settings,

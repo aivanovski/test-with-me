@@ -13,11 +13,11 @@ import com.github.aivanovski.testwithme.android.entity.db.JobEntry
 import com.github.aivanovski.testwithme.android.entity.db.StepEntry
 import com.github.aivanovski.testwithme.android.entity.exception.AppException
 import com.github.aivanovski.testwithme.android.entity.exception.FlowException
-import com.github.aivanovski.testwithme.android.extensions.unwrap
-import com.github.aivanovski.testwithme.android.extensions.unwrapError
 import com.github.aivanovski.testwithme.flow.commands.StepCommand
 import kotlinx.coroutines.delay
 import arrow.core.Either
+import com.github.aivanovski.testwithme.extensions.unwrap
+import com.github.aivanovski.testwithme.extensions.unwrapError
 
 class CommandExecutor(
     private val interactor: FlowInteractor,

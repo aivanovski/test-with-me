@@ -19,7 +19,6 @@ import com.github.aivanovski.testwithme.android.entity.db.ExecutionData
 import com.github.aivanovski.testwithme.android.entity.db.JobEntry
 import com.github.aivanovski.testwithme.android.entity.exception.AppException
 import com.github.aivanovski.testwithme.android.entity.exception.FlowException
-import com.github.aivanovski.testwithme.android.extensions.unwrapError
 import com.github.aivanovski.testwithme.entity.FlowStep
 import com.github.aivanovski.testwithme.entity.exception.AssertionException
 import com.github.aivanovski.testwithme.entity.exception.FailedToGetUiNodesException
@@ -28,6 +27,7 @@ import java.util.UUID
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
 import arrow.core.Either
+import com.github.aivanovski.testwithme.extensions.unwrapError
 
 class FlowInteractor(
     private val settings: Settings,

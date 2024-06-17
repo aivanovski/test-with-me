@@ -1,4 +1,4 @@
-package com.github.aivanovski.testwithme.android.extensions
+package com.github.aivanovski.testwithme.extensions
 
 import arrow.core.Either
 
