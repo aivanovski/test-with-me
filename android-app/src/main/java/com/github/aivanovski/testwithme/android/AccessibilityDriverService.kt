@@ -32,6 +32,8 @@ class AccessibilityDriverService : AccessibilityService() {
     private val scopeJob = Job()
     private val scope = CoroutineScope(Dispatchers.Main + scopeJob)
 
+    // TODO: refactor
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Timber.d("onStartCommand:")
         return super.onStartCommand(intent, flags, startId)

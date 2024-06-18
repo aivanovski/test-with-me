@@ -1,4 +1,4 @@
-package com.github.aivanovski.testwithme.android.presentation.screens.login
+package com.github.aivanovski.testwithme.android.presentation.screens.flowList
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModelProvider
@@ -6,21 +6,19 @@ import com.arkivanov.decompose.ComponentContext
 import com.github.aivanovski.testwithme.android.presentation.core.navigation.ScreenComponent
 import com.github.aivanovski.testwithme.android.presentation.screens.root.RootScreenComponent
 
-class LoginScreenComponent(
+class FlowListScreenComponent(
     rootComponent: RootScreenComponent
 ) : ScreenComponent, ComponentContext by rootComponent {
 
-    private val viewModel: LoginViewModel by lazy {
+    private val viewModel: FlowListViewModel by lazy {
         ViewModelProvider(
             owner = rootComponent.viewModelStoreOwner,
-            factory = LoginViewModel.Factory(
-                router = rootComponent.router
-            )
-        )[LoginViewModel::class]
+            factory = FlowListViewModel.Factory(rootComponent.router)
+        )[FlowListViewModel::class]
     }
 
     @Composable
     override fun render() {
-        LoginScreen(viewModel)
+        FlowListScreen(viewModel)
     }
 }

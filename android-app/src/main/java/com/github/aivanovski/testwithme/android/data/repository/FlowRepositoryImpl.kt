@@ -11,6 +11,7 @@ import com.github.aivanovski.testwithme.android.entity.FlowWithSteps
 import com.github.aivanovski.testwithme.android.entity.exception.AppException
 import com.github.aivanovski.testwithme.android.entity.exception.FailedToFindEntityException
 import arrow.core.Either
+import com.github.aivanovski.testwithme.android.entity.FlowSourceType
 
 class FlowRepositoryImpl(
     private val stepDao: StepEntryDao,
@@ -63,6 +64,21 @@ class FlowRepositoryImpl(
 
         flowDao.insert(flow.entry)
         stepDao.insert(flow.steps)
+    }
+
+    override suspend fun getFlows(): Either<AppException, List<FlowEntry>> = either {
+        val response = api.getFlows().bind()
+
+        val flows = response.flows.map { flow ->
+            FlowEntry(
+                id = null,
+                uid = flow.uid,
+                name = flow.name,
+                sourceType = FlowSourceType.REMOTE
+            )
+        }
+
+        return Either.Right(flows)
     }
 
     override suspend fun getNextStep(

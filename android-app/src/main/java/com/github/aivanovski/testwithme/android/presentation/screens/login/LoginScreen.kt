@@ -8,23 +8,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import com.github.aivanovski.testwithme.android.R
 import com.github.aivanovski.testwithme.android.presentation.core.compose.AppTextField
-import com.github.aivanovski.testwithme.android.presentation.core.compose.ScreenThemedPreview
+import com.github.aivanovski.testwithme.android.presentation.core.compose.ProgressIndicator
+import com.github.aivanovski.testwithme.android.presentation.core.compose.ThemedScreenPreview
+import com.github.aivanovski.testwithme.android.presentation.core.compose.SubscribeLifecycleEffect
 import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.AppTheme
 import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.LightTheme
 import com.github.aivanovski.testwithme.android.presentation.screens.login.model.LoginIntent
@@ -34,28 +31,14 @@ import com.github.aivanovski.testwithme.android.presentation.screens.login.model
 fun LoginScreen(viewModel: LoginViewModel) {
     val state by viewModel.state.collectAsState()
 
-    val lifecycleOwner by rememberUpdatedState(LocalLifecycleOwner.current)
-
     LoginScreen(
         state = state,
-        onIntent = { intent -> viewModel.sendIntent(intent) }
+        onIntent = viewModel::sendIntent
     )
 
-    // TODO: move to separate class or component
-    DisposableEffect(lifecycleOwner) {
-        val lifecycle = lifecycleOwner.lifecycle
-
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_START) {
-                viewModel.start()
-            }
-        }
-        lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycle.removeObserver(observer)
-        }
-    }
+    SubscribeLifecycleEffect(
+        onStart = viewModel::start
+    )
 }
 
 @Composable
@@ -67,7 +50,7 @@ private fun LoginScreen(
         LoginState.NotInitialized -> {}
 
         LoginState.Loading -> {
-            // TODO: draw progress
+            ProgressIndicator()
         }
 
         is LoginState.Data -> {
@@ -149,7 +132,7 @@ private fun LoginScreen(
 @Composable
 @Preview
 fun LoginScreenLightPreview() {
-    ScreenThemedPreview(theme = LightTheme) {
+    ThemedScreenPreview(theme = LightTheme) {
         LoginScreen(
             state = newDataState(),
             onIntent = {}
@@ -162,5 +145,5 @@ private fun newDataState(): LoginState.Data =
         username = "john.doe",
         password = "abc123",
         isPasswordVisible = false,
-        errorMessage = null
+        errorMessage = "Error has been occurred, please try again"
     )

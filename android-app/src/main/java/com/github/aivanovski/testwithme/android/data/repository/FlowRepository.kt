@@ -8,6 +8,8 @@ import com.github.aivanovski.testwithme.android.entity.exception.AppException
 
 interface FlowRepository {
 
+    suspend fun getFlows(): Either<AppException, List<FlowEntry>>
+
     suspend fun findStepByUid(uid: String): Either<AppException, StepEntry?>
 
     suspend fun getFlowByUid(

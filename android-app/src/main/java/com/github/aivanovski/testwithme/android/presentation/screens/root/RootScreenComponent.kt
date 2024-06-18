@@ -4,10 +4,11 @@ import androidx.lifecycle.ViewModelStoreOwner
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
-import com.arkivanov.essenty.instancekeeper.InstanceKeeperOwner
 import com.arkivanov.essenty.instancekeeper.getOrCreate
+import com.github.aivanovski.testwithme.android.presentation.core.navigation.RouterImpl
 import com.github.aivanovski.testwithme.android.presentation.core.viewmodel.ViewModelStoreOwnerImpl
 import com.github.aivanovski.testwithme.android.presentation.screens.Screen
+import com.github.aivanovski.testwithme.android.presentation.screens.flowList.FlowListScreenComponent
 import com.github.aivanovski.testwithme.android.presentation.screens.login.LoginScreenComponent
 
 class RootScreenComponent(
@@ -15,13 +16,13 @@ class RootScreenComponent(
 ) : ComponentContext by componentContext {
 
     val navigation = StackNavigation<Screen>()
-
     val childStack = childStack(
         source = navigation,
         serializer = Screen.serializer(),
         initialStack = { listOf(Screen.Login) },
         childFactory = { screen, _ -> createScreenComponent(screen) }
     )
+    val router = RouterImpl(this)
 
     val viewModelStoreOwner: ViewModelStoreOwner
         get() {
@@ -31,6 +32,7 @@ class RootScreenComponent(
     private fun createScreenComponent(screen: Screen): ComponentContext {
         return when (screen) {
             is Screen.Login -> LoginScreenComponent(this)
+            is Screen.FlowList -> FlowListScreenComponent(this)
         }
     }
 }

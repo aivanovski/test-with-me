@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.AppTheme
@@ -29,7 +28,7 @@ fun ThemedPreview(
 }
 
 @Composable
-fun ScreenThemedPreview(
+fun ThemedScreenPreview(
     theme: Theme,
     content: @Composable () -> Unit
 ) {

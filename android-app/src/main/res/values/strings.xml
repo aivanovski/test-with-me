@@ -8,6 +8,9 @@
     <string name="accessibility_service_name">UI Accessibility Service</string>
     <string name="accessibility_service_description">UI Accessibility Service for testing</string>
 
+    <!-- Common -->
+    <string name="error_has_been_occurred">Error has been occurred, please try again later</string>
+
     <!-- Login screen -->
     <string name="username">Username</string>
     <string name="password">Password</string>

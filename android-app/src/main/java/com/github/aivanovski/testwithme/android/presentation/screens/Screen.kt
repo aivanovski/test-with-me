@@ -7,4 +7,7 @@ sealed interface Screen {
 
     @Serializable
     object Login : Screen
+
+    @Serializable
+    object FlowList : Screen
 }

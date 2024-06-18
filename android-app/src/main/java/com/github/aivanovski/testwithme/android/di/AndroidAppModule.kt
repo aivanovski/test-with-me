@@ -19,6 +19,9 @@ import com.github.aivanovski.testwithme.android.domain.resources.ResourceProvide
 import com.github.aivanovski.testwithme.android.domain.resources.ResourceProviderImpl
 import com.github.aivanovski.testwithme.android.domain.usecases.GetCurrentJobUseCase
 import com.github.aivanovski.testwithme.android.domain.usecases.ParseFlowFileUseCase
+import com.github.aivanovski.testwithme.android.presentation.core.navigation.Router
+import com.github.aivanovski.testwithme.android.presentation.screens.flowList.FlowListInteractor
+import com.github.aivanovski.testwithme.android.presentation.screens.flowList.FlowListViewModel
 import com.github.aivanovski.testwithme.android.presentation.screens.login.LoginInteractor
 import com.github.aivanovski.testwithme.android.presentation.screens.login.LoginViewModel
 import io.ktor.client.HttpClient
@@ -58,10 +61,12 @@ object AndroidAppModule {
         // Interactors
         single { ErrorInteractor(get()) }
         single { FlowInteractor(get(), get(), get(), get(), get(), get()) }
-        single { LoginInteractor(get()) }
+        single { LoginInteractor(get(), get()) }
+        single { FlowListInteractor(get()) }
 
         // ViewModels
-        factory { LoginViewModel(get(), get()) }
+        factory { (router: Router) -> LoginViewModel(get(), get(), router) }
+        factory { (router: Router) -> FlowListViewModel(get(), get(), router) }
     }
 
     private fun provideStepEntryDao(db: AppDatabase): StepEntryDao = db.stepEntryDao

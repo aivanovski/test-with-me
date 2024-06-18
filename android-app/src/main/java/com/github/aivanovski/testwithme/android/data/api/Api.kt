@@ -9,6 +9,10 @@ object Api {
         return "$SERVER_URL/$FLOW/$flowUid"
     }
 
+    fun buildGetFlowsUrl(): String {
+        return "$SERVER_URL/$FLOW"
+    }
+
     fun buildLoginUrl(): String {
         return "$SERVER_URL/$LOGIN"
     }

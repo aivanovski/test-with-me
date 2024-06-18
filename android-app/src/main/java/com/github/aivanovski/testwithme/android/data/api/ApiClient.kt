@@ -4,11 +4,13 @@ import arrow.core.Either
 import arrow.core.raise.either
 import com.github.aivanovski.testwithme.android.data.Settings
 import com.github.aivanovski.testwithme.android.data.api.Api.buildGetFlowUrl
+import com.github.aivanovski.testwithme.android.data.api.Api.buildGetFlowsUrl
 import com.github.aivanovski.testwithme.android.data.api.Api.buildLoginUrl
 import com.github.aivanovski.testwithme.android.entity.exception.ApiException
 import com.github.aivanovski.testwithme.android.entity.exception.InvalidHttpStatusCodeException
 import com.github.aivanovski.testwithme.web.api.request.LoginRequest
 import com.github.aivanovski.testwithme.web.api.response.FlowResponse
+import com.github.aivanovski.testwithme.web.api.response.FlowsResponse
 import com.github.aivanovski.testwithme.web.api.response.LoginResponse
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.headers
@@ -28,11 +30,39 @@ class ApiClient(
     private val settings: Settings
 ) {
 
+    suspend fun getFlows(): Either<ApiException, FlowsResponse> = either {
+        val body = get(buildGetFlowsUrl()).bind()
+        parseJson<FlowsResponse>(body).bind()
+    }
+
     suspend fun getFlow(
         flowUid: String
     ): Either<ApiException, FlowResponse> = either {
         val body = get(buildGetFlowUrl(flowUid)).bind()
         parseJson<FlowResponse>(body).bind()
+    }
+
+    suspend fun login(
+        username: String,
+        password: String
+    ): Either<ApiException, LoginResponse> = either {
+        val body = Json.encodeToString(
+            LoginRequest(
+                username = username,
+                password = password
+            )
+        )
+
+        val response = httpClient.post(buildLoginUrl()) {
+            contentType(ContentType.Application.Json)
+            setBody(body)
+        }.bind()
+
+        if (response.status != HttpStatusCode.OK) {
+            raise(InvalidHttpStatusCodeException(response.status))
+        }
+
+        return parseJson(response.bodyAsText())
     }
 
     private suspend fun get(url: String): Either<ApiException, String> = either {
@@ -78,29 +108,6 @@ class ApiClient(
         } else {
             raise(InvalidHttpStatusCodeException(response.status))
         }
-    }
-
-    suspend fun login(
-        username: String,
-        password: String
-    ): Either<ApiException, LoginResponse> = either {
-        val body = Json.encodeToString(
-            LoginRequest(
-                username = username,
-                password = password
-            )
-        )
-
-        val response = httpClient.post(buildLoginUrl()) {
-            contentType(ContentType.Application.Json)
-            setBody(body)
-        }.bind()
-
-        if (response.status != HttpStatusCode.OK) {
-            raise(InvalidHttpStatusCodeException(response.status))
-        }
-
-        return parseJson(response.bodyAsText())
     }
 
     private inline fun <reified T> parseJson(

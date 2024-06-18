@@ -1,3 +1,5 @@
+- name: unlock_open-database.yaml
+
 - sendBroadcast: com.ivanovsky.passnotes/com.ivanovsky.passnotes.domain.test.TestDataBroadcastReceiver
   data:
     - key: isResetAppData
@@ -14,6 +16,9 @@
 - inputText: abc123
 - tapOn:
     contentDescription: unlockButton
-- assertVisible: DISABLE
+- waitUntil:
+    text: DISABLE
+    step: 1
+    timeout: 10
 - tapOn: DISABLE
 - assertVisible: Database

@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.github.aivanovski.testwithme.android.di.GlobalInjector
 import com.github.aivanovski.testwithme.android.domain.ErrorInteractor
 import com.github.aivanovski.testwithme.android.extensions.asFlow
+import com.github.aivanovski.testwithme.android.presentation.core.navigation.Router
+import com.github.aivanovski.testwithme.android.presentation.screens.Screen
 import com.github.aivanovski.testwithme.android.presentation.screens.login.model.LoginIntent
 import com.github.aivanovski.testwithme.android.presentation.screens.login.model.LoginState
 import com.github.aivanovski.testwithme.extensions.unwrapError
@@ -18,11 +20,13 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 
 class LoginViewModel(
     private val interactor: LoginInteractor,
-    private val errorInteractor: ErrorInteractor
+    private val errorInteractor: ErrorInteractor,
+    private val router: Router
 ) : ViewModel() {
 
     // TODO: check if onCleared() is called
@@ -116,11 +120,9 @@ class LoginViewModel(
             emit(LoginState.Loading)
 
             val response = interactor.login(state.username, state.password)
-            Timber.d("response=$response")
 
             if (response.isRight()) {
-                Timber.d("Success!") // TODO: show next screen
-                emit(currentState)
+                router.navigateTo(Screen.FlowList)
             } else {
                 emit(
                     currentState.copy(
@@ -131,11 +133,13 @@ class LoginViewModel(
         }
     }
 
-    class Factory : ViewModelProvider.Factory {
+    class Factory(private val router: Router) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return GlobalInjector.get<LoginViewModel>() as T
+            return GlobalInjector.get<LoginViewModel>(
+                params = parametersOf(router)
+            ) as T
         }
     }
 }

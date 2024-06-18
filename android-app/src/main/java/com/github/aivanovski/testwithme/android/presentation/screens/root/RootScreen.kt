@@ -11,7 +11,7 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.github.aivanovski.testwithme.android.presentation.core.ThemeProviderImpl
 import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.AppTheme
-import com.github.aivanovski.testwithme.android.presentation.screens.login.LoginScreenComponent
+import com.github.aivanovski.testwithme.android.presentation.core.navigation.ScreenComponent
 
 @Composable
 fun RootScreen(rootComponent: RootScreenComponent) {
@@ -25,16 +25,10 @@ fun RootScreen(rootComponent: RootScreenComponent) {
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background
             ) {
-                when (component) {
-                    is LoginScreenComponent -> {
-                        CompositionLocalProvider(
-                            LocalViewModelStoreOwner provides rootComponent.viewModelStoreOwner
-                        ) {
-                            component.render()
-                        }
-                    }
-
-                    else -> throw IllegalArgumentException("Unknown component type: $component")
+                CompositionLocalProvider(
+                    LocalViewModelStoreOwner provides rootComponent.viewModelStoreOwner
+                ) {
+                    (component as ScreenComponent).render()
                 }
             }
         }
