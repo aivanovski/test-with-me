@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import arrow.core.raise.either
 import com.github.aivanovski.testwithme.android.di.GlobalInjector
-import com.github.aivanovski.testwithme.android.domain.FlowInteractor
+import com.github.aivanovski.testwithme.android.domain.TestInteractor
 import com.github.aivanovski.testwithme.android.entity.exception.AppException
 import com.github.aivanovski.testwithme.android.utils.Base64Utils
 import com.github.aivanovski.testwithme.android.utils.StringUtils
@@ -18,7 +18,7 @@ import com.github.aivanovski.testwithme.extensions.unwrapError
 
 class TestFlowBroadcastReceiver : BroadcastReceiver() {
 
-    private val flowInteractor: FlowInteractor by GlobalInjector.inject()
+    private val testInteractor: TestInteractor by GlobalInjector.inject()
     private val scope = CoroutineScope(Dispatchers.IO)
 
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -47,9 +47,9 @@ class TestFlowBroadcastReceiver : BroadcastReceiver() {
     private suspend fun parseAndRunFlow(
         testContent: String
     ): Either<AppException, String> = either {
-        val jobUid = flowInteractor.parseAndAddToJobQueue(testContent).bind()
+        val jobUid = testInteractor.parseAndAddToJobQueue(testContent).bind()
 
-        flowInteractor.removeAllJobs(exclude = setOf(jobUid)).bind()
+        testInteractor.removeAllJobs(exclude = setOf(jobUid)).bind()
 
         jobUid
     }

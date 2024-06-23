@@ -29,7 +29,7 @@ import kotlinx.coroutines.withContext
 import arrow.core.Either
 import com.github.aivanovski.testwithme.extensions.unwrapError
 
-class FlowInteractor(
+class TestInteractor(
     private val settings: Settings,
     private val flowRepository: FlowRepository,
     private val runnerRepository: JobRepository,

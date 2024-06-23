@@ -1,7 +1,7 @@
 package com.github.aivanovski.testwithme.android.domain.flow
 
 import arrow.core.raise.either
-import com.github.aivanovski.testwithme.android.domain.FlowInteractor
+import com.github.aivanovski.testwithme.android.domain.TestInteractor
 import com.github.aivanovski.testwithme.flow.commands.Assert
 import com.github.aivanovski.testwithme.flow.commands.Broadcast
 import com.github.aivanovski.testwithme.flow.commands.InputText
@@ -19,7 +19,7 @@ import com.github.aivanovski.testwithme.entity.FlowStep
 import arrow.core.Either
 
 class StepCommandFactory(
-    private val interactor: FlowInteractor
+    private val interactor: TestInteractor
 ) {
 
     suspend fun createCommand(

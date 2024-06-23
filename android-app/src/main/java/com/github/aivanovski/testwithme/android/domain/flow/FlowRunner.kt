@@ -4,7 +4,7 @@ import android.view.accessibility.AccessibilityNodeInfo
 import arrow.core.raise.either
 import com.github.aivanovski.testwithme.android.data.Settings
 import com.github.aivanovski.testwithme.android.entity.OnStepFinishedAction
-import com.github.aivanovski.testwithme.android.domain.FlowInteractor
+import com.github.aivanovski.testwithme.android.domain.TestInteractor
 import com.github.aivanovski.testwithme.flow.driver.Driver
 import com.github.aivanovski.testwithme.android.entity.OnFinishAction
 import com.github.aivanovski.testwithme.android.entity.JobStatus
@@ -24,7 +24,7 @@ import com.github.aivanovski.testwithme.extensions.unwrapError
 
 class FlowRunner(
     private val settings: Settings,
-    private val interactor: FlowInteractor,
+    private val interactor: TestInteractor,
     driver: Driver<AccessibilityNodeInfo>
 ) {
 

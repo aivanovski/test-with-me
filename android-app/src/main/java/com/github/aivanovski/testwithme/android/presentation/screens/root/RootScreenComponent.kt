@@ -1,5 +1,6 @@
 package com.github.aivanovski.testwithme.android.presentation.screens.root
 
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.StackNavigation
@@ -28,6 +29,12 @@ class RootScreenComponent(
         get() {
             return instanceKeeper.getOrCreate(::ViewModelStoreOwnerImpl)
         }
+
+    val viewModel: RootViewModel by lazy {
+        ViewModelProvider(
+            owner = viewModelStoreOwner
+        )[RootViewModel::class]
+    }
 
     private fun createScreenComponent(screen: Screen): ComponentContext {
         return when (screen) {

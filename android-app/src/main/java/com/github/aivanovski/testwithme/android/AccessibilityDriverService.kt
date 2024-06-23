@@ -9,7 +9,7 @@ import android.os.IBinder
 import android.view.accessibility.AccessibilityEvent
 import com.github.aivanovski.testwithme.android.data.Settings
 import com.github.aivanovski.testwithme.android.di.GlobalInjector.inject
-import com.github.aivanovski.testwithme.android.domain.FlowInteractor
+import com.github.aivanovski.testwithme.android.domain.TestInteractor
 import com.github.aivanovski.testwithme.android.domain.flow.AccessibilityDriverImpl
 import com.github.aivanovski.testwithme.android.domain.flow.FlowRunner
 import com.github.aivanovski.testwithme.entity.Duration
@@ -23,7 +23,7 @@ import timber.log.Timber
 class AccessibilityDriverService : AccessibilityService() {
 
     private val settings: Settings by inject()
-    private val interactor: FlowInteractor by inject()
+    private val interactor: TestInteractor by inject()
 
     private val driver = AccessibilityDriverImpl(this, this)
     private val runner = FlowRunner(settings, interactor, driver)
