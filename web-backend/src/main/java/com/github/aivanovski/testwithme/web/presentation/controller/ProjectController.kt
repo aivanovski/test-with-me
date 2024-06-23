@@ -1,11 +1,11 @@
 package com.github.aivanovski.testwithme.web.presentation.controller
 
 import arrow.core.Either
+import arrow.core.raise.either
 import com.github.aivanovski.testwithme.web.data.repository.ProjectRepository
 import com.github.aivanovski.testwithme.web.entity.ErrorResponse
 import com.github.aivanovski.testwithme.web.entity.User
 import com.github.aivanovski.testwithme.web.extensions.toErrorResponse
-import com.github.aivanovski.testwithme.extensions.unwrap
 import com.github.aivanovski.testwithme.web.api.response.ProjectsItemDto
 import com.github.aivanovski.testwithme.web.api.response.ProjectsResponse
 
@@ -15,20 +15,19 @@ class ProjectController(
 
     fun getProjects(
         user: User
-    ): Either<ErrorResponse, ProjectsResponse> {
-        val getProjects = projectRepository.getProjects()
-        if (getProjects.isLeft()) {
-            return getProjects.toErrorResponse()
-        }
+    ): Either<ErrorResponse, ProjectsResponse> = either {
+        val projects = projectRepository.getByUserUid(user.uid)
+            .mapLeft { error -> error.toErrorResponse() }
+            .bind()
 
-        val projects = getProjects.unwrap()
+        val items = projects
             .map { project ->
                 ProjectsItemDto(
-                    uid = project.uid,
+                    uid = project.uid.toString(),
                     name = project.name
                 )
             }
 
-        return Either.Right(ProjectsResponse(projects))
+        ProjectsResponse(items)
     }
 }

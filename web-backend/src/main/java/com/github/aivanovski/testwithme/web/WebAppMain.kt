@@ -1,5 +1,6 @@
 package com.github.aivanovski.testwithme.web
 
+import com.github.aivanovski.testwithme.web.data.database.configureDatabase
 import com.github.aivanovski.testwithme.web.di.WebAppModule
 import com.github.aivanovski.testwithme.web.presentation.configureAuthentication
 import com.github.aivanovski.testwithme.web.presentation.routes.configureRouting
@@ -19,6 +20,7 @@ fun main(args: Array<String>) {
         install(ContentNegotiation) {
             json()
         }
+        configureDatabase()
         configureAuthentication()
         configureRouting()
     }.start(wait = true)

@@ -1,6 +1,8 @@
 package com.github.aivanovski.testwithme.web.entity
 
 data class User(
-    val uid: String,
-    val name: String
+    val id: Long? = null,
+    val uid: Uid,
+    val name: String,
+    val password: String
 )

@@ -1,6 +1,7 @@
 package com.github.aivanovski.testwithme.web.domain.service
 
 import arrow.core.Either
+import arrow.core.raise.either
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
@@ -11,9 +12,7 @@ import com.github.aivanovski.testwithme.web.entity.JwtData
 import com.github.aivanovski.testwithme.web.entity.User
 import com.github.aivanovski.testwithme.web.entity.exception.ExpiredTokenException
 import com.github.aivanovski.testwithme.web.entity.exception.InvalidTokenException
-import com.github.aivanovski.testwithme.extensions.unwrap
-import com.github.aivanovski.testwithme.extensions.unwrapError
-import io.ktor.http.HttpStatusCode
+import com.github.aivanovski.testwithme.web.extensions.toErrorResponse
 import io.ktor.server.auth.jwt.JWTPrincipal
 import java.util.Date
 import java.util.concurrent.ConcurrentHashMap
@@ -27,11 +26,13 @@ class AuthService(
     private val storage: MutableMap<Credentials, String> = ConcurrentHashMap<Credentials, String>()
 
     fun isCredentialsValid(credentials: Credentials): Boolean {
-        return credentials.username == "admin" &&
-            credentials.password == "abc123"
+        val user = userRepository.getUserByName(credentials.username).getOrNull()
+            ?: return false
+
+        return credentials.username == user.name && credentials.password == user.password
     }
 
-    fun validateToken(principal: JWTPrincipal): Either<ErrorResponse, User> {
+    fun validateToken(principal: JWTPrincipal): Either<ErrorResponse, User> = either {
         val username = principal.payload.getClaim(USERNAME).asString()
         val expiresAt = principal.expiresAt?.time
 
@@ -41,36 +42,19 @@ class AuthService(
             expiresAt?.let { Date(it) }
         )
 
-        if (!isValidUsername(username) || expiresAt == null) {
-            return Either.Left(
-                ErrorResponse.fromException(
-                    status = HttpStatusCode.Unauthorized,
-                    exception = InvalidTokenException()
-                )
-            )
+        if (expiresAt == null) {
+            raise(InvalidTokenException().toErrorResponse())
         }
 
         if (System.currentTimeMillis() >= expiresAt) {
-            return Either.Left(
-                ErrorResponse.fromException(
-                    status = HttpStatusCode.Unauthorized,
-                    exception = ExpiredTokenException()
-                )
-            )
+            raise(ExpiredTokenException().toErrorResponse())
         }
 
-        val getUserResult = userRepository.getUserByName(username)
-        if (getUserResult.isLeft()) {
-            return Either.Left(
-                ErrorResponse.fromException(
-                    status = HttpStatusCode.Unauthorized,
-                    exception = getUserResult.unwrapError()
-                )
-            )
-        }
+        val user = userRepository.getUserByName(username)
+            .mapLeft { error -> error.toErrorResponse() }
+            .bind()
 
-        val user = getUserResult.unwrap()
-        return Either.Right(user)
+        user
     }
 
     fun getOrCreateToken(
@@ -93,10 +77,6 @@ class AuthService(
         return newToken
     }
 
-    private fun isValidUsername(username: String): Boolean {
-        return username == "admin"
-    }
-
     private fun createToken(
         username: String
     ): String {
@@ -104,7 +84,7 @@ class AuthService(
 
         // TODO: expiration was prolonged for developing needs
         // val expires = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1)
-        val expires = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(7)
+        val expires = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(60)
 
         return JWT.create()
             .withAudience(jwtData.audience)

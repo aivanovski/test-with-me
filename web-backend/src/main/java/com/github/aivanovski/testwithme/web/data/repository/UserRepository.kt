@@ -5,6 +5,7 @@ import com.github.aivanovski.testwithme.web.entity.User
 import com.github.aivanovski.testwithme.web.entity.exception.AppException
 
 interface UserRepository {
-    fun getUserUid(uid: String): Either<AppException, User>
-    fun getUserByName(username: String): Either<AppException, User>
+    fun getUsers(): Either<AppException, List<User>>
+    fun getUserByName(name: String): Either<AppException, User>
+    fun add(user: User): Either<AppException, User>
 }

@@ -1,4 +1,4 @@
-- name: new_db_create-new.yaml
+- name: Create new database
 
 - sendBroadcast: com.ivanovsky.passnotes/com.ivanovsky.passnotes.domain.test.TestDataBroadcastReceiver
   data:

@@ -7,6 +7,6 @@ object Errors {
     const val INVALID_OR_EXPIRED_TOKEN = "The token is invalid or has expired."
     const val ERROR_HAS_BEEN_OCCURRED = "Error has been occurred."
 
-    const val INVALID_PARAMETER = "Invalid parameter: {}"
-    const val ENTITY_NOT_FOUND = "Entity '{}' not found: {}={}"
+    const val INVALID_PARAMETER = "Invalid parameter: %s"
+    const val ENTITY_NOT_FOUND = "Entity '%s' not found: %s=%s"
 }

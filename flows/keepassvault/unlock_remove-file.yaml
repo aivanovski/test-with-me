@@ -1,4 +1,4 @@
-- name: unlock_remove-file.yaml
+- name: Remove selected database file
 
 - sendBroadcast: com.ivanovsky.passnotes/com.ivanovsky.passnotes.domain.test.TestDataBroadcastReceiver
   data:

@@ -75,4 +75,19 @@ dependencies {
     // TestWithMe API
     implementation(project(":test-with-me"))
     implementation(project(":web-api"))
+
+    // Database
+    implementation("org.jetbrains.exposed:exposed-core:0.51.1")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.51.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.51.1")
+    implementation("com.h2database:h2:2.2.224")
+    implementation("com.zaxxer:HikariCP:3.4.2")
+    // // implementation("org.hibernate.orm:hibernate-core:6.5.2.Final")
+    // implementation("org.hibernate.orm:hibernate-c3p0:6.5.2.Final")
+
+    // implementation("org.hibernate.orm:hibernate-entitymanager:6.5.2.Final")
+
+    // implementation("org.springframework.data:spring-data-jpa:3.3.1")
+
+
 }

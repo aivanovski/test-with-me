@@ -1,4 +1,4 @@
-- name: about_navigate-back.yaml
+- name: Open about screen
 
 - sendBroadcast: com.ivanovsky.passnotes/com.ivanovsky.passnotes.domain.test.TestDataBroadcastReceiver
   data:
@@ -6,11 +6,9 @@
       value: true
 
 - launch: com.ivanovsky.passnotes
-- assertVisible: No databases
+- assertVisible: KeePassVault
 - tapOn:
     contentDescription: Navigate up
 - tapOn: About
 - assertVisible:
     hasText: KeePassVault is client for KeePass
-- pressKey: Back
-- assertVisible: No databases

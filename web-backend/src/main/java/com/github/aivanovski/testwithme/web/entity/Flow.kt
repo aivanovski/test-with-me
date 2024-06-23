@@ -1,8 +1,9 @@
 package com.github.aivanovski.testwithme.web.entity
 
 data class Flow(
-    val uid: String,
-    val projectUid: String,
+    val id: Long? = null,
+    val uid: Uid,
+    val projectUid: Uid,
     val name: String,
-    val resource: String
+    val path: String
 )

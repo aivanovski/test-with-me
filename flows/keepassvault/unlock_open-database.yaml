@@ -1,4 +1,4 @@
-- name: unlock_open-database.yaml
+- name: Unlock database
 
 - sendBroadcast: com.ivanovsky.passnotes/com.ivanovsky.passnotes.domain.test.TestDataBroadcastReceiver
   data:
