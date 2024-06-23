@@ -13,6 +13,12 @@ class FlowRepositoryImpl(
     private val projectDao: ProjectDao
 ) : FlowRepository {
 
+    override fun findByFlowUid(
+        uid: Uid
+    ): Either<AppException, Flow?> = either {
+        flowDao.getByUid(uid)
+    }
+
     override fun getFlowsByUserUid(
         userUid: Uid
     ): Either<AppException, List<Flow>> = either {

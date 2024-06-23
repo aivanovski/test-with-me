@@ -25,20 +25,20 @@ class ProjectEntity(id: EntityID<Long>) : Entity<Long>(id) {
 class ProjectDao {
 
     fun getAll(): List<Project> = transaction {
-        ProjectEntity.all().map { it.convertToProject() }
+        ProjectEntity.all().map { it.readRow() }
     }
 
     fun getByUserUid(userUid: Uid): List<Project> = transaction {
         val uidText = userUid.toString()
 
         ProjectEntity.find { (ProjectsTable.userUid eq uidText) }
-            .map { it.convertToProject() }
+            .map { it.readRow() }
     }
 
     fun getByUid(uid: Uid): Project? = transaction {
         val uidText = uid.toString()
         ProjectEntity.find { (ProjectsTable.uid eq uidText) }
-            .map { it.convertToProject() }
+            .map { it.readRow() }
             .firstOrNull()
     }
 
@@ -47,10 +47,10 @@ class ProjectDao {
             uid = project.uid.toString()
             userUid = project.userUid.toString()
             name = project.name
-        }.convertToProject()
+        }.readRow()
     }
 
-    private fun ProjectEntity.convertToProject(): Project {
+    private fun ProjectEntity.readRow(): Project {
         return Project(
             id = id.value,
             uid = Uid.fromString(uid),

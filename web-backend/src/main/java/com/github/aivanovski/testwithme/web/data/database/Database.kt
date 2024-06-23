@@ -12,7 +12,12 @@ fun configureDatabase() {
     Database.connect(createConnection())
 
     transaction {
-        SchemaUtils.create(ProjectsTable, FlowsTable, UsersTable)
+        SchemaUtils.create(
+            ProjectsTable,
+            FlowsTable,
+            UsersTable,
+            ExecutionStatsTable
+        )
     }
 
     val initDataUseCase: InitializeDefaultDataUseCase = get()

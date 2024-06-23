@@ -5,6 +5,7 @@ object Api {
     const val LOGIN = "/login"
     const val FLOW = "/flow"
     const val PROJECT = "/project"
+    const val EXECUTION = "/execution"
 
     // Params
     const val ID = "id"

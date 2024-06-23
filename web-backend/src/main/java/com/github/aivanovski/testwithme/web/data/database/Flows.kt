@@ -27,7 +27,14 @@ class FlowEntity(id: EntityID<Long>) : Entity<Long>(id) {
 class FlowDao {
 
     fun getAll(): List<Flow> = transaction {
-        FlowEntity.all().map { it.convertToFlow() }
+        FlowEntity.all().map { it.readRow() }
+    }
+
+    fun getByUid(uid: Uid): Flow? = transaction {
+        val uidText = uid.toString()
+        FlowEntity.find { (FlowsTable.uid eq uidText) }
+            .map { it.readRow() }
+            .firstOrNull()
     }
 
     fun insert(flow: Flow): Flow = transaction {
@@ -36,10 +43,10 @@ class FlowDao {
             projectUid = flow.projectUid.toString()
             name = flow.name
             path = flow.path
-        }.convertToFlow()
+        }.readRow()
     }
 
-    private fun FlowEntity.convertToFlow(): Flow {
+    private fun FlowEntity.readRow(): Flow {
         return Flow(
             id = id.value,
             uid = Uid.fromString(uid),

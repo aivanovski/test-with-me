@@ -19,6 +19,8 @@ import com.github.aivanovski.testwithme.extensions.unwrap
 import com.github.aivanovski.testwithme.extensions.unwrapError
 import com.github.aivanovski.testwithme.utils.StringUtils
 import com.github.aivanovski.testwithme.web.api.response.ErrorMessage
+import com.github.aivanovski.testwithme.web.presentation.controller.ExecutionStatController
+import com.github.aivanovski.testwithme.web.presentation.routes.Api.EXECUTION
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCall
@@ -37,10 +39,11 @@ import org.slf4j.LoggerFactory
 val logger = LoggerFactory.getLogger("Routes")
 
 fun Application.configureRouting() {
-    val authService = get<AuthService>()
-    val loginController = get<LoginController>()
-    val flowController = get<FlowController>()
-    val projectController = get<ProjectController>()
+    val authService: AuthService by lazy { get() }
+    val loginController: LoginController by lazy { get() }
+    val flowController: FlowController by lazy { get() }
+    val projectController: ProjectController by lazy { get() }
+    val executionController: ExecutionStatController by lazy { get() }
 
     routing {
         post(LOGIN) {
@@ -70,6 +73,20 @@ fun Application.configureRouting() {
             get(PROJECT) {
                 handleAuthenticated(authService, call) { user ->
                     projectController.getProjects(user)
+                }
+            }
+        }
+
+        authenticate(AUTH_PROVIDER) {
+            get(EXECUTION) {
+                handleAuthenticated(authService, call) { user ->
+                    executionController.getExecutionStats(user)
+                }
+            }
+
+            post(EXECUTION) {
+                handleAuthenticated(authService, call) { user ->
+                    executionController.add(user, call.receive())
                 }
             }
         }
