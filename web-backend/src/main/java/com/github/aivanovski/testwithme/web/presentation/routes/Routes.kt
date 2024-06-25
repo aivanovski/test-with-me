@@ -10,17 +10,17 @@ import com.github.aivanovski.testwithme.web.presentation.Errors.ERROR_HAS_BEEN_O
 import com.github.aivanovski.testwithme.web.presentation.Errors.INVALID_OR_EXPIRED_TOKEN
 import com.github.aivanovski.testwithme.web.presentation.controller.FlowController
 import com.github.aivanovski.testwithme.web.presentation.controller.LoginController
-import com.github.aivanovski.testwithme.web.presentation.routes.Api.FLOW
 import com.github.aivanovski.testwithme.web.presentation.routes.Api.ID
-import com.github.aivanovski.testwithme.web.presentation.routes.Api.LOGIN
 import com.github.aivanovski.testwithme.web.presentation.controller.ProjectController
-import com.github.aivanovski.testwithme.web.presentation.routes.Api.PROJECT
 import com.github.aivanovski.testwithme.extensions.unwrap
 import com.github.aivanovski.testwithme.extensions.unwrapError
 import com.github.aivanovski.testwithme.utils.StringUtils
+import com.github.aivanovski.testwithme.web.api.Endpoints.FLOR_RUN
+import com.github.aivanovski.testwithme.web.api.Endpoints.FLOW
+import com.github.aivanovski.testwithme.web.api.Endpoints.LOGIN
+import com.github.aivanovski.testwithme.web.api.Endpoints.PROJECT
 import com.github.aivanovski.testwithme.web.api.response.ErrorMessage
-import com.github.aivanovski.testwithme.web.presentation.controller.ExecutionStatController
-import com.github.aivanovski.testwithme.web.presentation.routes.Api.EXECUTION
+import com.github.aivanovski.testwithme.web.presentation.controller.FlowRunController
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCall
@@ -43,7 +43,7 @@ fun Application.configureRouting() {
     val loginController: LoginController by lazy { get() }
     val flowController: FlowController by lazy { get() }
     val projectController: ProjectController by lazy { get() }
-    val executionController: ExecutionStatController by lazy { get() }
+    val flowRunController: FlowRunController by lazy { get() }
 
     routing {
         post(LOGIN) {
@@ -78,15 +78,15 @@ fun Application.configureRouting() {
         }
 
         authenticate(AUTH_PROVIDER) {
-            get(EXECUTION) {
+            get(FLOR_RUN) {
                 handleAuthenticated(authService, call) { user ->
-                    executionController.getExecutionStats(user)
+                    flowRunController.getFlowRuns(user)
                 }
             }
 
-            post(EXECUTION) {
+            post(FLOR_RUN) {
                 handleAuthenticated(authService, call) { user ->
-                    executionController.add(user, call.receive())
+                    flowRunController.add(user, call.receive())
                 }
             }
         }

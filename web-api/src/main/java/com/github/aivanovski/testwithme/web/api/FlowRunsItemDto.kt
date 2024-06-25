@@ -3,9 +3,11 @@ package com.github.aivanovski.testwithme.web.api
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ExecutionStatisticItemDto(
+data class FlowRunsItemDto(
     val flowUid: String,
     val userUid: String,
-    val executionTime: String,
+    val finishedAt: String,
+    val finishedAtTimestamp: Long,
+    val durationInMillis: Long,
     val isSuccess: Boolean
 )

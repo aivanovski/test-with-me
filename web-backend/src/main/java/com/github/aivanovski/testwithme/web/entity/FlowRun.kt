@@ -1,10 +1,11 @@
 package com.github.aivanovski.testwithme.web.entity
 
-data class ExecutionStat(
+data class FlowRun(
     val id: Long? = null,
     val flowUid: Uid,
     val userUid: Uid,
-    val executionTime: Timestamp,
+    val timestamp: Timestamp,
+    val durationInMillis: Long,
     val isSuccess: Boolean,
     val result: String
 )

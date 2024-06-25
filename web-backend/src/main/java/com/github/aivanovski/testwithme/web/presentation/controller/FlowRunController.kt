@@ -2,36 +2,36 @@ package com.github.aivanovski.testwithme.web.presentation.controller
 
 import arrow.core.Either
 import arrow.core.raise.either
-import com.github.aivanovski.testwithme.web.api.ExecutionStatisticItemDto
-import com.github.aivanovski.testwithme.web.api.request.PostExecutionStatRequest
-import com.github.aivanovski.testwithme.web.api.response.PostExecutionStatisticResponse
-import com.github.aivanovski.testwithme.web.api.response.ExecutionStatisticsResponse
-import com.github.aivanovski.testwithme.web.data.repository.ExecutionStatRepository
+import com.github.aivanovski.testwithme.web.api.FlowRunsItemDto
+import com.github.aivanovski.testwithme.web.api.request.PostFlowRunRequest
+import com.github.aivanovski.testwithme.web.api.response.PostFlowRunResponse
+import com.github.aivanovski.testwithme.web.api.response.FlowRunsResponse
+import com.github.aivanovski.testwithme.web.data.repository.FlowRunRepository
 import com.github.aivanovski.testwithme.web.data.repository.FlowRepository
 import com.github.aivanovski.testwithme.web.data.repository.ProjectRepository
 import com.github.aivanovski.testwithme.web.entity.ErrorResponse
 import com.github.aivanovski.testwithme.web.entity.Timestamp
 import com.github.aivanovski.testwithme.web.entity.Uid
 import com.github.aivanovski.testwithme.web.entity.User
-import com.github.aivanovski.testwithme.web.entity.ExecutionStat
+import com.github.aivanovski.testwithme.web.entity.FlowRun
 import com.github.aivanovski.testwithme.web.entity.exception.FlowNotFoundByUidException
 import com.github.aivanovski.testwithme.web.entity.exception.InvalidRequestField
 import com.github.aivanovski.testwithme.web.extensions.toErrorResponse
 
-class ExecutionStatController(
+class FlowRunController(
     private val flowRepository: FlowRepository,
     private val projectRepository: ProjectRepository,
-    private val executionRepository: ExecutionStatRepository
+    private val flowRunRepository: FlowRunRepository
 ) {
 
-    fun getExecutionStats(
+    fun getFlowRuns(
         user: User
-    ): Either<ErrorResponse, ExecutionStatisticsResponse> = either {
+    ): Either<ErrorResponse, FlowRunsResponse> = either {
         val userFlows = projectRepository.getByUserUid(user.uid)
             .mapLeft { error -> error.toErrorResponse() }
             .bind()
 
-        val allStats = executionRepository.getAll()
+        val allStats = flowRunRepository.getAll()
             .mapLeft { error -> error.toErrorResponse() }
             .bind()
 
@@ -40,22 +40,24 @@ class ExecutionStatController(
             stat.userUid == user.uid || stat.flowUid in userFlowUids
         }
 
-        val items = filteredStats.map { stat ->
-            ExecutionStatisticItemDto(
-                flowUid = stat.flowUid.toString(),
-                userUid = stat.userUid.toString(),
-                executionTime = stat.executionTime.formatForTransport(),
-                isSuccess = stat.isSuccess
+        val items = filteredStats.map { flowRun ->
+            FlowRunsItemDto(
+                flowUid = flowRun.flowUid.toString(),
+                userUid = flowRun.userUid.toString(),
+                finishedAt = flowRun.timestamp.formatForTransport(),
+                finishedAtTimestamp = flowRun.timestamp.milliseconds,
+                durationInMillis = flowRun.durationInMillis,
+                isSuccess = flowRun.isSuccess
             )
         }
 
-        ExecutionStatisticsResponse(items)
+        FlowRunsResponse(items)
     }
 
     fun add(
         user: User,
-        request: PostExecutionStatRequest
-    ): Either<ErrorResponse, PostExecutionStatisticResponse> = either {
+        request: PostFlowRunRequest
+    ): Either<ErrorResponse, PostFlowRunResponse> = either {
         val flowUid = Uid.parse(request.flowId).getOrNull()
             ?: raise(InvalidRequestField("flowId").toErrorResponse())
 
@@ -64,18 +66,19 @@ class ExecutionStatController(
             .bind()
             ?: raise(FlowNotFoundByUidException(flowUid.toString()).toErrorResponse())
 
-        val stat = ExecutionStat(
+        val flowRun = FlowRun(
             flowUid = flow.uid,
             userUid = user.uid,
-            executionTime = Timestamp.now(),
+            timestamp = Timestamp.now(),
             isSuccess = request.isSuccess,
+            durationInMillis = request.durationInMillis,
             result = request.result
         )
 
-        executionRepository.add(stat)
+        flowRunRepository.add(flowRun)
             .mapLeft { error -> error.toErrorResponse() }
             .bind()
 
-        PostExecutionStatisticResponse(true)
+        PostFlowRunResponse(true)
     }
 }

@@ -3,8 +3,9 @@ package com.github.aivanovski.testwithme.web.api.request
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class PostExecutionStatRequest(
+data class PostFlowRunRequest(
     val flowId: String,
+    val durationInMillis: Long,
     val isSuccess: Boolean,
     val result: String
 )

@@ -16,7 +16,7 @@ fun configureDatabase() {
             ProjectsTable,
             FlowsTable,
             UsersTable,
-            ExecutionStatsTable
+            FlowRunsTable
         )
     }
 

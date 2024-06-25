@@ -1,5 +1,6 @@
 package com.github.aivanovski.testwithme.web.entity
 
+import com.github.aivanovski.testwithme.web.api.common.ApiDateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -9,7 +10,7 @@ data class Timestamp(
 ) {
 
     fun formatForTransport(): String {
-        return TRANSPORT_FORMAT.format(Date(milliseconds))
+        return ApiDateFormat.DATE_TIME_FORMAT.format(Date(milliseconds))
     }
 
     override fun toString(): String {
@@ -19,11 +20,6 @@ data class Timestamp(
     companion object {
         private val ISO_FORMAT = SimpleDateFormat(
             "yyyy-MM-dd'T'HH:mm:ss.SSS",
-            Locale.ENGLISH
-        )
-
-        private val TRANSPORT_FORMAT = SimpleDateFormat(
-            "yyyy-MM-dd HH:mm:ss",
             Locale.ENGLISH
         )
 
