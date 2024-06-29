@@ -12,6 +12,8 @@ import com.github.aivanovski.testwithme.android.entity.exception.AppException
 import com.github.aivanovski.testwithme.android.entity.exception.FailedToFindEntityException
 import arrow.core.Either
 import com.github.aivanovski.testwithme.android.entity.FlowSourceType
+import com.github.aivanovski.testwithme.android.entity.exception.FailedToFindFlowByUidException
+import com.github.aivanovski.testwithme.android.domain.dataconverters.convertToStepEntries
 
 class FlowRepositoryImpl(
     private val stepDao: StepEntryDao,
@@ -33,9 +35,27 @@ class FlowRepositoryImpl(
         flowUid: String
     ): Either<AppException, FlowWithSteps> = either {
         val flow = flowDao.getByUidWithSteps(flowUid)
-            ?: raise(newUnableToFindFlowByUidError(flowUid))
+            ?: raise(FailedToFindFlowByUidException(flowUid))
 
-        flow
+        if (flow.entry.sourceType == FlowSourceType.REMOTE) {
+            val response = api.getFlow(flowUid).bind()
+
+            val yamlFlow = parseFlowUseCase.parseBase64File(
+                base64content = response.flow.base64Content
+            ).bind()
+
+            val stepEntries = yamlFlow.steps.convertToStepEntries(
+                flowUid = flowUid
+            )
+
+            stepDao.removeByFlowUid(flowUid)
+            stepDao.insert(stepEntries)
+
+            flowDao.getByUidWithSteps(flowUid)
+                ?: raise(FailedToFindFlowByUidException(flowUid))
+        } else {
+            flow
+        }
     }
 
     override suspend fun getStepByUid(
@@ -69,16 +89,27 @@ class FlowRepositoryImpl(
     override suspend fun getFlows(): Either<AppException, List<FlowEntry>> = either {
         val response = api.getFlows().bind()
 
-        val flows = response.flows.map { flow ->
+        val remoteFlows = response.flows.map { flow ->
             FlowEntry(
                 id = null,
                 uid = flow.uid,
+                projectUid = flow.projectUid,
                 name = flow.name,
                 sourceType = FlowSourceType.REMOTE
             )
         }
 
-        return Either.Right(flows)
+        val uidToLocalFlowMap = flowDao.getAll()
+            .associateBy { flow -> flow.uid }
+
+        for (remote in remoteFlows) {
+            val local = uidToLocalFlowMap[remote.uid]
+            if (local == null) {
+                flowDao.insert(remote)
+            }
+        }
+
+        return Either.Right(remoteFlows)
     }
 
     override suspend fun getNextStep(
@@ -88,20 +119,22 @@ class FlowRepositoryImpl(
         val existingFlowEntry = flowUid?.let { flowDao.getByUid(flowUid) }
 
         val flow = if (existingFlowEntry == null) {
-            if (flowUid == null) {
-                raise(AppException("Flow uid is null"))
-            }
+//            if (flowUid == null) {
+//                raise(AppException("Flow uid is null"))
+//            }
+//
+//            val response = api.getFlow(flowUid).bind()
+//
+//            val yamlFlow = parseFlowUseCase.parseBase64File(
+//                base64content = response.flow.base64Content
+//            ).bind()
+//
+//            stepDao.removeByFlowUid(flowUid)
+//
+//            flowDao.insert(yamlFlow.entry)
+//            stepDao.insert(yamlFlow.steps)
 
-            val response = api.getFlow(flowUid).bind()
-
-            val flowEntry = parseFlowUseCase.parseBase64File(
-                base64content = response.flow.base64Content
-            ).bind()
-
-            flowDao.insert(flowEntry.entry)
-            stepDao.insert(flowEntry.steps)
-
-            flowEntry
+            raise(AppException("Not implemented"))
         } else {
             flowDao.getByUidWithSteps(existingFlowEntry.uid)
                 ?: raise(newUnableToFindFlowByUidError(existingFlowEntry.uid))

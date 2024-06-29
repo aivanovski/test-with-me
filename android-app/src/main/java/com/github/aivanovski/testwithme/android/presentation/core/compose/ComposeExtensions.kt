@@ -23,9 +23,11 @@ inline fun rememberOnClickedCallback(
     return remember { { block.invoke() } }
 }
 
+// TODO: lifecycle subscription should be moved to component
 @Composable
 fun SubscribeLifecycleEffect(
-    onStart: () -> Unit
+    onStart: () -> Unit,
+    onDestroy: () -> Unit
 ) {
     val lifecycleOwner by rememberUpdatedState(LocalLifecycleOwner.current)
 
@@ -33,8 +35,16 @@ fun SubscribeLifecycleEffect(
         val lifecycle = lifecycleOwner.lifecycle
 
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_START) {
-                onStart.invoke()
+            when (event) {
+                Lifecycle.Event.ON_START -> {
+                    onStart.invoke()
+                }
+
+                Lifecycle.Event.ON_DESTROY -> {
+                    onDestroy.invoke()
+                }
+
+                else -> {}
             }
         }
 

@@ -13,7 +13,6 @@ import com.github.aivanovski.testwithme.android.R
 import com.github.aivanovski.testwithme.android.presentation.core.compose.CenteredBox
 import com.github.aivanovski.testwithme.android.presentation.core.compose.ErrorMessage
 import com.github.aivanovski.testwithme.android.presentation.core.compose.ProgressIndicator
-import com.github.aivanovski.testwithme.android.presentation.core.compose.SubscribeLifecycleEffect
 import com.github.aivanovski.testwithme.android.presentation.core.compose.ThemedScreenPreview
 import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.LightTheme
 import com.github.aivanovski.testwithme.android.presentation.screens.flowList.model.FlowItem
@@ -27,10 +26,6 @@ fun FlowListScreen(viewModel: FlowListViewModel) {
     FlowListScreen(
         state = state,
         onIntent = viewModel::sendIntent
-    )
-
-    SubscribeLifecycleEffect(
-        onStart = viewModel::start
     )
 }
 

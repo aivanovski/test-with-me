@@ -14,6 +14,9 @@ data class FlowEntry(
     @ColumnInfo("uid")
     val uid: String,
 
+    @ColumnInfo("project_uid")
+    val projectUid: String,
+
     @ColumnInfo("name")
     val name: String,
 

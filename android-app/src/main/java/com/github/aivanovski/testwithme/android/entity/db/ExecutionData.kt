@@ -4,6 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+// TODO: should be StepExecutionData
+
 @Entity("execution_data")
 data class ExecutionData(
     @PrimaryKey(autoGenerate = true)

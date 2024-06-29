@@ -27,6 +27,9 @@ import java.util.UUID
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
 import arrow.core.Either
+import com.github.aivanovski.testwithme.android.domain.dataconverters.convertToFlowEntry
+import com.github.aivanovski.testwithme.android.entity.db.FlowEntry
+import com.github.aivanovski.testwithme.android.domain.dataconverters.convertToStepEntries
 import com.github.aivanovski.testwithme.extensions.unwrapError
 
 class TestInteractor(
@@ -144,23 +147,22 @@ class TestInteractor(
         base64Content: String
     ): Either<AppException, String> = withContext(IO) {
         either {
-            val flow = parseFlowUseCase.parseBase64File(base64Content)
-                .map { flow ->
-                    flow.copy(
-                        entry = flow.entry.copy(
-                            sourceType = FlowSourceType.LOCAL
-                        )
-                    )
-                }
-                .bind()
+            val yamlFlow = parseFlowUseCase.parseBase64File(base64Content).bind()
 
-            val flowUid = flow.entry.uid
+            val flowUid = yamlFlow.name
+            val flow = yamlFlow.convertToFlowEntry(
+                flowUid = flowUid,
+                projectUid = "Local",
+                sourceType = FlowSourceType.LOCAL
+            )
+            val steps = yamlFlow.steps.convertToStepEntries(
+                flowUid = flowUid
+            )
 
             flowRepository.removeFlowData(flowUid).bind()
+            flowRepository.save(FlowWithSteps(flow, steps)).bind()
 
-            flowRepository.save(flow).bind()
-
-            val firstStepUid = flow.steps.firstOrNull()?.uid
+            val firstStepUid = steps.firstOrNull()?.uid
                 ?: raise(AppException("No steps found"))
 
             addRunnerEntry(

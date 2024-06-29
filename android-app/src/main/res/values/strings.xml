@@ -15,5 +15,8 @@
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="login">Login</string>
+    
+    <!-- Flow screen -->
+    <string name="run_upper">RUN</string>
 
 </resources>

@@ -12,7 +12,9 @@ import com.github.aivanovski.testwithme.android.data.db.dao.FlowEntryDao
 import com.github.aivanovski.testwithme.android.data.db.dao.JobDao
 import com.github.aivanovski.testwithme.android.data.db.dao.StepEntryDao
 import com.github.aivanovski.testwithme.android.data.repository.ExecutionDataRepository
+import com.github.aivanovski.testwithme.android.data.repository.FlowRunRepository
 import com.github.aivanovski.testwithme.android.data.repository.JobRepository
+import com.github.aivanovski.testwithme.android.data.repository.ProjectRepository
 import com.github.aivanovski.testwithme.android.domain.ErrorInteractor
 import com.github.aivanovski.testwithme.android.domain.TestInteractor
 import com.github.aivanovski.testwithme.android.domain.resources.ResourceProvider
@@ -22,6 +24,9 @@ import com.github.aivanovski.testwithme.android.domain.usecases.ParseFlowFileUse
 import com.github.aivanovski.testwithme.android.presentation.core.navigation.Router
 import com.github.aivanovski.testwithme.android.presentation.screens.flow.FlowInteractor
 import com.github.aivanovski.testwithme.android.presentation.screens.flow.FlowViewModel
+import com.github.aivanovski.testwithme.android.presentation.screens.flow.cells.FlowCellModelFactory
+import com.github.aivanovski.testwithme.android.presentation.screens.flow.cells.FlowCellViewModelFactory
+import com.github.aivanovski.testwithme.android.presentation.screens.flow.model.FlowScreenArgs
 import com.github.aivanovski.testwithme.android.presentation.screens.flowList.FlowListInteractor
 import com.github.aivanovski.testwithme.android.presentation.screens.flowList.FlowListViewModel
 import com.github.aivanovski.testwithme.android.presentation.screens.login.LoginInteractor
@@ -56,6 +61,8 @@ object AndroidAppModule {
         single<FlowRepository> { FlowRepositoryImpl(get(), get(), get(), get()) }
         single { JobRepository(get()) }
         single { ExecutionDataRepository(get()) }
+        single { ProjectRepository(get()) }
+        single { FlowRunRepository(get()) }
 
         // UseCases
         single { ParseFlowFileUseCase() }
@@ -66,12 +73,30 @@ object AndroidAppModule {
         single { TestInteractor(get(), get(), get(), get(), get(), get()) }
         single { LoginInteractor(get(), get()) }
         single { FlowListInteractor(get()) }
-        single { FlowInteractor() }
+        single { FlowInteractor(get(), get(), get()) }
+
+        // Cell factories
+        single { FlowCellModelFactory(get()) }
+        single { FlowCellViewModelFactory() }
 
         // ViewModels
-        factory { (router: Router) -> LoginViewModel(get(), get(), router) }
-        factory { (router: Router) -> FlowListViewModel(get(), get(), router) }
-        factory { (vm: RootViewModel, router: Router) -> FlowViewModel(get(), vm, router) }
+        factory { (router: Router) -> RootViewModel(get(), router) }
+        factory { (vm: RootViewModel, router: Router) ->
+            LoginViewModel(get(), get(), vm, router)
+        }
+        factory { (vm: RootViewModel, router: Router) ->
+            FlowListViewModel(get(), get(), vm, router)
+        }
+        factory { (vm: RootViewModel, router: Router, args: FlowScreenArgs) ->
+            FlowViewModel(
+                get(),
+                get(),
+                get(),
+                vm,
+                router,
+                args
+            )
+        }
     }
 
     private fun provideStepEntryDao(db: AppDatabase): StepEntryDao = db.stepEntryDao
@@ -92,7 +117,7 @@ object AndroidAppModule {
                             Timber.d(message)
                         }
                     }
-                    level = LogLevel.BODY
+                    level = LogLevel.INFO
                 }
             }
         )

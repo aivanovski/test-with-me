@@ -3,6 +3,7 @@ package com.github.aivanovski.testwithme.android.presentation.core.compose.theme
 import android.app.Activity
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -17,24 +18,31 @@ import androidx.compose.ui.platform.LocalView
 data class Theme(
     val colors: AppColors,
     val materialColors: ColorScheme,
+    val typography: Typography
 )
 
 val LightTheme = Theme(
     colors = LightAppColors,
     materialColors = lightColorScheme(
+        background = LightAppColors.background,
+        primaryContainer = LightAppColors.primaryCardBackground,
         primary = LightAppColors.primary,
         secondary = LightAppColors.secondary,
         tertiary = LightAppColors.tertiary
-    )
+    ),
+    typography = AppTypography
 )
 
 val DarkTheme = Theme(
     colors = DarkAppColors,
     materialColors = darkColorScheme(
+        background = DarkAppColors.background,
+        primaryContainer = DarkAppColors.primaryCardBackground,
         primary = DarkAppColors.primary,
         secondary = DarkAppColors.secondary,
         tertiary = DarkAppColors.tertiary
-    )
+    ),
+    typography = AppTypography
 )
 
 val LocalExtendedColors = staticCompositionLocalOf {
@@ -58,6 +66,7 @@ fun AppTheme(
     CompositionLocalProvider(LocalExtendedColors provides theme) {
         MaterialTheme(
             colorScheme = theme.materialColors,
+            typography = theme.typography,
             content = content
         )
     }

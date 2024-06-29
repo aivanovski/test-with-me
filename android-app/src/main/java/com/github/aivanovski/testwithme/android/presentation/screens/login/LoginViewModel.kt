@@ -10,7 +10,11 @@ import com.github.aivanovski.testwithme.android.presentation.core.navigation.Rou
 import com.github.aivanovski.testwithme.android.presentation.screens.Screen
 import com.github.aivanovski.testwithme.android.presentation.screens.login.model.LoginIntent
 import com.github.aivanovski.testwithme.android.presentation.screens.login.model.LoginState
+import com.github.aivanovski.testwithme.android.presentation.screens.root.RootViewModel
+import com.github.aivanovski.testwithme.android.presentation.screens.root.model.RootIntent
+import com.github.aivanovski.testwithme.android.presentation.screens.root.model.TopBarState
 import com.github.aivanovski.testwithme.extensions.unwrapError
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +30,7 @@ import timber.log.Timber
 class LoginViewModel(
     private val interactor: LoginInteractor,
     private val errorInteractor: ErrorInteractor,
+    private val rootViewModel: RootViewModel,
     private val router: Router
 ) : ViewModel() {
 
@@ -36,18 +41,22 @@ class LoginViewModel(
     private val intents = Channel<LoginIntent>()
 
     fun start() {
-        if (state.value != LoginState.NotInitialized) {
-            return
-        }
+        rootViewModel.sendIntent(RootIntent.SetTopBarState(createTopBarState()))
 
-        viewModelScope.launch {
-            intents.receiveAsFlow()
-                .onStart { emit(LoginIntent.Initialize) }
-                .flatMapLatest { intent -> handleIntent(intent, state.value) }
-                .collect { newState ->
-                    state.value = newState
-                }
+        if (state.value == LoginState.NotInitialized) {
+            viewModelScope.launch {
+                intents.receiveAsFlow()
+                    .onStart { emit(LoginIntent.Initialize) }
+                    .flatMapLatest { intent -> handleIntent(intent, state.value) }
+                    .collect { newState ->
+                        state.value = newState
+                    }
+            }
         }
+    }
+
+    fun clear() {
+        onCleared()
     }
 
     fun sendIntent(intent: LoginIntent) {
@@ -122,7 +131,7 @@ class LoginViewModel(
             val response = interactor.login(state.username, state.password)
 
             if (response.isRight()) {
-                router.navigateTo(Screen.FlowList)
+                router.setRoot(Screen.FlowList)
             } else {
                 emit(
                     currentState.copy(
@@ -133,12 +142,22 @@ class LoginViewModel(
         }
     }
 
-    class Factory(private val router: Router) : ViewModelProvider.Factory {
+    private fun createTopBarState(): TopBarState {
+        return TopBarState(
+            title = "Login", // TODO: string
+            isBackVisible = false
+        )
+    }
+
+    class Factory(
+        private val rootViewModel: RootViewModel,
+        private val router: Router
+    ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return GlobalInjector.get<LoginViewModel>(
-                params = parametersOf(router)
+                params = parametersOf(rootViewModel, router)
             ) as T
         }
     }

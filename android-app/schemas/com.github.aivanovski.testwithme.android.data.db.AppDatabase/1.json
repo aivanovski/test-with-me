@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "cdc9e617e0d89edc751b37c99d1b5604",
+    "identityHash": "fff713a33bb2179a1d4f58b986e123e0",
     "entities": [
       {
         "tableName": "step_entry",
@@ -62,7 +62,7 @@
       },
       {
         "tableName": "flow_entry",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `uid` TEXT NOT NULL, `name` TEXT NOT NULL, `source_type` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `uid` TEXT NOT NULL, `project_uid` TEXT NOT NULL, `name` TEXT NOT NULL, `source_type` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -73,6 +73,12 @@
           {
             "fieldPath": "uid",
             "columnName": "uid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "projectUid",
+            "columnName": "project_uid",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -208,7 +214,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cdc9e617e0d89edc751b37c99d1b5604')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fff713a33bb2179a1d4f58b986e123e0')"
     ]
   }
 }

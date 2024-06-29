@@ -3,15 +3,18 @@ package com.github.aivanovski.testwithme.android.data.api
 import arrow.core.Either
 import arrow.core.raise.either
 import com.github.aivanovski.testwithme.android.data.Settings
-import com.github.aivanovski.testwithme.android.data.api.Api.buildGetFlowUrl
-import com.github.aivanovski.testwithme.android.data.api.Api.buildGetFlowsUrl
-import com.github.aivanovski.testwithme.android.data.api.Api.buildLoginUrl
+import com.github.aivanovski.testwithme.android.entity.FlowRun
+import com.github.aivanovski.testwithme.android.entity.Project
 import com.github.aivanovski.testwithme.android.entity.exception.ApiException
 import com.github.aivanovski.testwithme.android.entity.exception.InvalidHttpStatusCodeException
+import com.github.aivanovski.testwithme.android.utils.DateUtils
+import com.github.aivanovski.testwithme.web.api.common.ApiDateFormat
 import com.github.aivanovski.testwithme.web.api.request.LoginRequest
+import com.github.aivanovski.testwithme.web.api.response.FlowRunsResponse
 import com.github.aivanovski.testwithme.web.api.response.FlowResponse
 import com.github.aivanovski.testwithme.web.api.response.FlowsResponse
 import com.github.aivanovski.testwithme.web.api.response.LoginResponse
+import com.github.aivanovski.testwithme.web.api.response.ProjectsResponse
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.headers
 import io.ktor.client.request.setBody
@@ -26,19 +29,50 @@ import kotlinx.serialization.json.Json
 import timber.log.Timber
 
 class ApiClient(
-    private val httpClient: HttpRequestExecutor,
+    private val executor: HttpRequestExecutor,
     private val settings: Settings
 ) {
+    private val urlFactory = ApiUrlFactory()
+
+    suspend fun getFlowRuns(): Either<ApiException, List<FlowRun>> = either {
+        val body = get(urlFactory.getFlowRuns()).bind()
+        val response = parseJson<FlowRunsResponse>(body).bind()
+
+        response.stats.mapNotNull { item ->
+            // TODO: time could be str+long
+            val time = DateUtils.parseOrNull(ApiDateFormat.DATE_TIME_FORMAT, item.finishedAt)
+                    ?: return@mapNotNull null
+
+            FlowRun(
+                flowUid = item.flowUid,
+                userUid = item.userUid,
+                executionTime = time,
+                isSuccess = item.isSuccess
+            )
+        }
+    }
+
+    suspend fun getProjects(): Either<ApiException, List<Project>> = either {
+        val body = get(urlFactory.getProjects()).bind()
+        val response = parseJson<ProjectsResponse>(body).bind()
+
+        response.projects.map { project ->
+            Project(
+                uid = project.uid,
+                name = project.name
+            )
+        }
+    }
 
     suspend fun getFlows(): Either<ApiException, FlowsResponse> = either {
-        val body = get(buildGetFlowsUrl()).bind()
+        val body = get(urlFactory.getFlows()).bind()
         parseJson<FlowsResponse>(body).bind()
     }
 
     suspend fun getFlow(
         flowUid: String
     ): Either<ApiException, FlowResponse> = either {
-        val body = get(buildGetFlowUrl(flowUid)).bind()
+        val body = get(urlFactory.getFlow(flowUid)).bind()
         parseJson<FlowResponse>(body).bind()
     }
 
@@ -53,7 +87,7 @@ class ApiClient(
             )
         )
 
-        val response = httpClient.post(buildLoginUrl()) {
+        val response = executor.post(urlFactory.login()) {
             contentType(ContentType.Application.Json)
             setBody(body)
         }.bind()
@@ -85,7 +119,7 @@ class ApiClient(
         }
 
         // Do request
-        val response = httpClient.get(url, block = builder).bind()
+        val response = executor.get(url, block = builder).bind()
 
         if (response.status == HttpStatusCode.OK) {
             return@either response.bodyAsText()
@@ -98,7 +132,7 @@ class ApiClient(
             settings.authToken = loginResponse.token
 
             // Do request
-            val retryResponse = httpClient.get(url, block = builder).bind()
+            val retryResponse = executor.get(url, block = builder).bind()
 
             if (retryResponse.status != HttpStatusCode.OK) {
                 raise(InvalidHttpStatusCodeException(response.status))

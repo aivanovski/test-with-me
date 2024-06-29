@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.github.aivanovski.testwithme.android.presentation.core.IntentProvider
 import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.AppTheme
 import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.Theme
 
@@ -44,3 +45,5 @@ fun ThemedScreenPreview(
         }
     }
 }
+
+object PreviewIntentProvider : IntentProvider
