@@ -53,7 +53,7 @@ fun Application.configureRouting() {
         }
 
         authenticate(AUTH_PROVIDER) {
-            get(FLOW) {
+            get("/$FLOW") {
                 handleAuthenticated(authService, call) { user ->
                     flowController.getFlows(user)
                 }
@@ -61,7 +61,7 @@ fun Application.configureRouting() {
         }
 
         authenticate(AUTH_PROVIDER) {
-            get("$FLOW/{$ID}") {
+            get("/$FLOW/{$ID}") {
                 handleAuthenticated(authService, call) { user ->
                     val uid = call.parameters[ID] ?: StringUtils.EMPTY
                     flowController.getFlow(user, uid)
@@ -70,7 +70,7 @@ fun Application.configureRouting() {
         }
 
         authenticate(AUTH_PROVIDER) {
-            get(PROJECT) {
+            get("/$PROJECT") {
                 handleAuthenticated(authService, call) { user ->
                     projectController.getProjects(user)
                 }
@@ -78,13 +78,13 @@ fun Application.configureRouting() {
         }
 
         authenticate(AUTH_PROVIDER) {
-            get(FLOR_RUN) {
+            get("/$FLOR_RUN") {
                 handleAuthenticated(authService, call) { user ->
                     flowRunController.getFlowRuns(user)
                 }
             }
 
-            post(FLOR_RUN) {
+            post("/$FLOR_RUN") {
                 handleAuthenticated(authService, call) { user ->
                     flowRunController.add(user, call.receive())
                 }
