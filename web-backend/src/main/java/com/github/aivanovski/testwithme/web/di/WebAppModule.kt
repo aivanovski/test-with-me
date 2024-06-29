@@ -20,6 +20,7 @@ import com.github.aivanovski.testwithme.web.data.database.UserDao
 import com.github.aivanovski.testwithme.web.data.file.FlowContentProvider
 import com.github.aivanovski.testwithme.web.data.repository.FlowRunRepository
 import com.github.aivanovski.testwithme.web.presentation.controller.FlowRunController
+import com.github.aivanovski.testwithme.web.presentation.controller.UserController
 import org.koin.dsl.module
 
 object WebAppModule {
@@ -52,5 +53,6 @@ object WebAppModule {
         single { FlowController(get(), get(), get()) }
         single { ProjectController(get()) }
         single { FlowRunController(get(), get(), get()) }
+        single { UserController(get()) }
     }
 }

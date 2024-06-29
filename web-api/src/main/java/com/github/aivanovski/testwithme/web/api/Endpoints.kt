@@ -5,4 +5,5 @@ object Endpoints {
     const val FLOW = "flow"
     const val PROJECT = "project"
     const val FLOR_RUN = "flow-run"
+    const val USER = "user"
 }

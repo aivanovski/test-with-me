@@ -55,6 +55,12 @@
     {:type :GET
      :endpoint "/flow-run"
      :headers AUTH})
+
+  "user"
+  (request 
+    {:type :GET
+     :endpoint "/user"
+     :headers AUTH})
   )
 
 (comment

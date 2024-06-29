@@ -17,6 +17,7 @@ import com.github.aivanovski.testwithme.web.entity.FlowRun
 import com.github.aivanovski.testwithme.web.entity.exception.FlowNotFoundByUidException
 import com.github.aivanovski.testwithme.web.entity.exception.InvalidRequestField
 import com.github.aivanovski.testwithme.web.extensions.toErrorResponse
+import com.github.aivanovski.testwithme.web.extensions.transformError
 
 class FlowRunController(
     private val flowRepository: FlowRepository,
@@ -28,11 +29,11 @@ class FlowRunController(
         user: User
     ): Either<ErrorResponse, FlowRunsResponse> = either {
         val userFlows = projectRepository.getByUserUid(user.uid)
-            .mapLeft { error -> error.toErrorResponse() }
+            .transformError()
             .bind()
 
         val allStats = flowRunRepository.getAll()
-            .mapLeft { error -> error.toErrorResponse() }
+            .transformError()
             .bind()
 
         val userFlowUids = userFlows.map { flow -> flow.uid }
@@ -62,7 +63,7 @@ class FlowRunController(
             ?: raise(InvalidRequestField("flowId").toErrorResponse())
 
         val flow = flowRepository.findByFlowUid(flowUid)
-            .mapLeft { error -> error.toErrorResponse() }
+            .transformError()
             .bind()
             ?: raise(FlowNotFoundByUidException(flowUid.toString()).toErrorResponse())
 
@@ -76,7 +77,7 @@ class FlowRunController(
         )
 
         flowRunRepository.add(flowRun)
-            .mapLeft { error -> error.toErrorResponse() }
+            .transformError()
             .bind()
 
         PostFlowRunResponse(true)
