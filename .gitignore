@@ -33,3 +33,7 @@ google-services.json
 *.hprof
 
 app-db/
+
+# Clojure files
+.clj-kondo/
+.lsp
