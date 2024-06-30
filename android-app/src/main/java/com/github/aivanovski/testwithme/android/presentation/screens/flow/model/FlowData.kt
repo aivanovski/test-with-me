@@ -3,9 +3,11 @@ package com.github.aivanovski.testwithme.android.presentation.screens.flow.model
 import com.github.aivanovski.testwithme.android.entity.FlowRun
 import com.github.aivanovski.testwithme.android.entity.FlowWithSteps
 import com.github.aivanovski.testwithme.android.entity.Project
+import com.github.aivanovski.testwithme.android.entity.User
 
 data class FlowData(
     val flow: FlowWithSteps,
     val project: Project,
-    val executions: List<FlowRun>
+    val runs: List<FlowRun>,
+    val users: List<User>
 )

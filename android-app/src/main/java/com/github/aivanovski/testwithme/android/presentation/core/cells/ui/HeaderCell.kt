@@ -3,9 +3,12 @@ package com.github.aivanovski.testwithme.android.presentation.core.cells.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
@@ -24,6 +27,8 @@ import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.
 import com.github.aivanovski.testwithme.android.presentation.core.cells.model.HeaderCellModel
 import com.github.aivanovski.testwithme.android.presentation.core.cells.viewModel.HeaderCellViewModel
 import com.github.aivanovski.testwithme.android.presentation.core.compose.rememberOnClickedCallback
+import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.HalfMargin
+import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.MediumMargin
 
 @Composable
 fun HeaderCell(viewModel: HeaderCellViewModel) {
@@ -38,7 +43,7 @@ fun HeaderCell(viewModel: HeaderCellViewModel) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = ElementMargin)
-            .defaultMinSize(minHeight = 48.dp)
+            .defaultMinSize(minHeight = 48.dp) // TODO: dimen
     ) {
         Text(
             text = model.title,
@@ -48,16 +53,19 @@ fun HeaderCell(viewModel: HeaderCellViewModel) {
                 .weight(weight = 1f)
         )
 
-        if (model.isIconVisible) {
+        if (model.icon != null) {
             Box(
                 modifier = Modifier
-                    .padding(
-                        end = ElementMargin
-                    )
                     .clickable(onClick = onIconClick)
+                    .padding(
+                        start = ElementMargin,
+                        end = ElementMargin,
+                        top = MediumMargin,
+                        bottom = MediumMargin
+                    )
             ) {
                 Image(
-                    imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
+                    imageVector = model.icon,
                     contentDescription = null
                 )
             }
@@ -67,9 +75,13 @@ fun HeaderCell(viewModel: HeaderCellViewModel) {
 
 @Composable
 @Preview
-fun HeaderCellLightPreview() {
+fun HeaderCellPreview() {
     ThemedPreview(theme = LightTheme) {
-        HeaderCell(newHeaderCellViewModel())
+        Column {
+            HeaderCell(newHeaderCellViewModel())
+            Spacer(modifier = Modifier.height(ElementMargin))
+            HeaderCell(newHeaderWithIconCellViewModel())
+        }
     }
 }
 
@@ -78,7 +90,18 @@ fun newHeaderCellViewModel(): HeaderCellViewModel {
         model = HeaderCellModel(
             id = "id",
             title = "Header",
-            isIconVisible = true
+            icon = null
+        ),
+        intentProvider = PreviewIntentProvider
+    )
+}
+
+fun newHeaderWithIconCellViewModel(): HeaderCellViewModel {
+    return HeaderCellViewModel(
+        model = HeaderCellModel(
+            id = "id",
+            title = "Header",
+            icon = Icons.AutoMirrored.Outlined.ArrowForwardIos
         ),
         intentProvider = PreviewIntentProvider
     )

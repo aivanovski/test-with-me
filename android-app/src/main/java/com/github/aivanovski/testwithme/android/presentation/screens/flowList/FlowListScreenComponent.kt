@@ -5,19 +5,20 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.essenty.lifecycle.subscribe
 import com.github.aivanovski.testwithme.android.presentation.core.decompose.ViewModelStoreOwnerImpl
 import com.github.aivanovski.testwithme.android.presentation.core.navigation.Router
 import com.github.aivanovski.testwithme.android.presentation.core.navigation.ScreenComponent
 import com.github.aivanovski.testwithme.android.presentation.screens.root.RootViewModel
-import timber.log.Timber
+import com.github.aivanovski.testwithme.android.utils.LifecycleLogger
 
 class FlowListScreenComponent(
-    component: ComponentContext,
+    context: ComponentContext,
     rootViewModel: RootViewModel,
     router: Router
 ) : ScreenComponent,
-    ComponentContext by component,
+    ComponentContext by context,
     ViewModelStoreOwner by ViewModelStoreOwnerImpl() {
 
     override val viewModelStore: ViewModelStore

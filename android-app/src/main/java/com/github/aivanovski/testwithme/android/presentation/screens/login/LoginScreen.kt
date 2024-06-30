@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,15 +15,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.github.aivanovski.testwithme.android.R
+import com.github.aivanovski.testwithme.android.entity.ErrorMessage
 import com.github.aivanovski.testwithme.android.presentation.core.compose.AppTextField
+import com.github.aivanovski.testwithme.android.presentation.core.compose.ErrorMessage
 import com.github.aivanovski.testwithme.android.presentation.core.compose.ProgressIndicator
 import com.github.aivanovski.testwithme.android.presentation.core.compose.ThemedScreenPreview
-import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.AppTheme
+import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.GroupMargin
 import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.LightTheme
 import com.github.aivanovski.testwithme.android.presentation.screens.login.model.LoginIntent
 import com.github.aivanovski.testwithme.android.presentation.screens.login.model.LoginState
@@ -49,34 +51,24 @@ private fun LoginScreen(
         }
 
         is LoginState.Data -> {
-            if (state.errorMessage != null) {
-                Box(
-                    contentAlignment = Alignment.TopCenter,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = state.errorMessage,
-                        fontSize = 24.sp,
-                        textAlign = TextAlign.Center,
-                        color = AppTheme.theme.materialColors.error,
-                        modifier = Modifier
-                            .padding(top = 64.dp)
-                            .fillMaxWidth(fraction = 0.8f)
-                    )
-                }
-            }
-
             Box(
-                contentAlignment = Alignment.Center,
+                contentAlignment = Alignment.TopCenter,
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
+                        .padding(top = GroupMargin)
                         .fillMaxWidth(fraction = 0.8f)
+                        .verticalScroll(rememberScrollState())
                 ) {
+                    if (state.errorMessage != null) {
+                        ErrorMessage(
+                            message = state.errorMessage
+                        )
+                    }
+
                     AppTextField(
                         value = state.username,
                         label = stringResource(R.string.username),
@@ -107,7 +99,7 @@ private fun LoginScreen(
                     )
 
                     Button(
-                        onClick = {
+                        onClick = { // TODO: optimize
                             onIntent.invoke(LoginIntent.OnLoginButtonClicked)
                         },
                         modifier = Modifier
@@ -126,7 +118,7 @@ private fun LoginScreen(
 
 @Composable
 @Preview
-fun LoginScreenLightPreview() {
+fun DataStatePreview() {
     ThemedScreenPreview(theme = LightTheme) {
         LoginScreen(
             state = newDataState(),
@@ -135,10 +127,46 @@ fun LoginScreenLightPreview() {
     }
 }
 
+@Composable
+@Preview
+fun ErrorStatePreview() {
+    ThemedScreenPreview(theme = LightTheme) {
+        LoginScreen(
+            state = newDataWithErrorState(),
+            onIntent = {}
+        )
+    }
+}
+
+@Composable
+@Preview
+fun LoadingStatePreview() {
+    ThemedScreenPreview(theme = LightTheme) {
+        LoginScreen(
+            state = newLoadingState(),
+            onIntent = {}
+        )
+    }
+}
+
+private fun newLoadingState(): LoginState.Loading = LoginState.Loading
+
 private fun newDataState(): LoginState.Data =
     LoginState.Data(
         username = "john.doe",
         password = "abc123",
         isPasswordVisible = false,
-        errorMessage = "Error has been occurred, please try again"
+        errorMessage = null
+    )
+
+@Composable
+private fun newDataWithErrorState(): LoginState.Data =
+    LoginState.Data(
+        username = "john.doe",
+        password = "abc123",
+        isPasswordVisible = false,
+        errorMessage = ErrorMessage(
+            message = stringResource(R.string.error_has_been_occurred),
+            cause = Exception()
+        )
     )

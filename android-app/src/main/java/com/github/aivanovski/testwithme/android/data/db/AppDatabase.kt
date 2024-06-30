@@ -9,11 +9,12 @@ import com.github.aivanovski.testwithme.android.data.db.converters.FlowSourceTyp
 import com.github.aivanovski.testwithme.android.data.db.converters.FlowStepConverter
 import com.github.aivanovski.testwithme.android.data.db.converters.JobStatusConverter
 import com.github.aivanovski.testwithme.android.data.db.converters.StepVerificationTypeConverter
-import com.github.aivanovski.testwithme.android.data.db.dao.ExecutionDataDao
+import com.github.aivanovski.testwithme.android.data.db.converters.SyncStatusConverter
+import com.github.aivanovski.testwithme.android.data.db.dao.LocalStepRunDao
 import com.github.aivanovski.testwithme.android.data.db.dao.FlowEntryDao
 import com.github.aivanovski.testwithme.android.data.db.dao.JobDao
 import com.github.aivanovski.testwithme.android.data.db.dao.StepEntryDao
-import com.github.aivanovski.testwithme.android.entity.db.ExecutionData
+import com.github.aivanovski.testwithme.android.entity.db.LocalStepRun
 import com.github.aivanovski.testwithme.android.entity.db.FlowEntry
 import com.github.aivanovski.testwithme.android.entity.db.JobEntry
 import com.github.aivanovski.testwithme.android.entity.db.StepEntry
@@ -23,14 +24,14 @@ import com.github.aivanovski.testwithme.android.entity.db.StepEntry
         StepEntry::class,
         FlowEntry::class,
         JobEntry::class,
-        ExecutionData::class
+        LocalStepRun::class
     ],
     version = 1
 )
 @TypeConverters(
     FlowStepConverter::class,
     StepVerificationTypeConverter::class,
-    // FlowStatusConverter::class,
+    SyncStatusConverter::class,
     FlowSourceTypeConverter::class,
     JobStatusConverter::class
 )
@@ -39,7 +40,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val stepEntryDao: StepEntryDao
     abstract val flowEntryDao: FlowEntryDao
     abstract val runnerEntryDao: JobDao
-    abstract val executionDataDao: ExecutionDataDao
+    abstract val executionDataDao: LocalStepRunDao
 
     companion object {
 
@@ -53,7 +54,7 @@ abstract class AppDatabase : RoomDatabase() {
             )
                 .addTypeConverter(FlowStepConverter())
                 .addTypeConverter(StepVerificationTypeConverter())
-                // .addTypeConverter(FlowStatusConverter())
+                .addTypeConverter(SyncStatusConverter())
                 .addTypeConverter(FlowSourceTypeConverter())
                 .addTypeConverter(JobStatusConverter())
                 .build()

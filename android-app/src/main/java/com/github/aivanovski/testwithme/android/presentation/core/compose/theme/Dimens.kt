@@ -11,3 +11,5 @@ val ElementMargin = 16.dp
 val GroupMargin = 24.dp
 
 val CardCornerSize = 8.dp
+
+val MediumIconSize = 24.dp

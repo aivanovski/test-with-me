@@ -17,25 +17,31 @@ data class AppColors(
     val secondary: Color,
     val tertiary: Color,
     val background: Color,
-    val primaryCardBackground: Color,
-    val secondaryCardBackground: Color,
+    val secondaryBackground: Color,
+    val cardOnPrimaryBackground: Color,
+    val cardOnSecondaryBackground: Color,
     val primaryText: Color,
     val secondaryText: Color,
+    val errorText: Color,
     val testGreen: Color,
-    val testRed: Color
+    val testRed: Color,
+    val primaryButton: Color,
 )
 
 val LightAppColors = AppColors(
     primary = Purple40,
     secondary = PurpleGrey40,
     tertiary = Pink40,
-    background = Color(0xFF_ececed),
-    primaryCardBackground = Color(0xFF_ffffff),
-    secondaryCardBackground = Color(0xFF_f2f4f7),
+    background = Color(0xFF_ffffff),
+    secondaryBackground = Color(0xFF_ececed),
+    cardOnPrimaryBackground = Color(0xFF_f2f4f7),
+    cardOnSecondaryBackground = Color(0xFF_ffffff),
     primaryText = Color(0xFF_00000d),
-    secondaryText = Color.Gray,
+    secondaryText = Color(0xFF_888888),
+    errorText = Color(0xFF_f2473b),
     testGreen = Color(0xFF_2c9066),
-    testRed = Color(0xFF_f2473b)
+    testRed = Color(0xFF_f2473b),
+    primaryButton = Color(0xFF_1c7c92)
 )
 
 val DarkAppColors = AppColors(
@@ -43,10 +49,13 @@ val DarkAppColors = AppColors(
     secondary = PurpleGrey80,
     tertiary = Pink80,
     background = Color(0xFF_181c1e),
-    primaryCardBackground = Color(0xFF_181c1e),
-    secondaryCardBackground = Color(0xFF_f2f4f7),
+    secondaryBackground = Color(0xFF_ececed),
+    cardOnPrimaryBackground = Color(0xFF_181c1e),
+    cardOnSecondaryBackground = Color(0xFF_f2f4f7),
     primaryText = Color.White,
     secondaryText = Color.Gray,
+    errorText = Color(0xFFdd1445),
     testGreen = Color(0xFF1de5a9),
-    testRed = Color(0xFFdd1445)
+    testRed = Color(0xFFdd1445),
+    primaryButton = Color(0xFF_5dd4e4)
 )

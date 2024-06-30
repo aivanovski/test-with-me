@@ -1,5 +1,7 @@
 package com.github.aivanovski.testwithme.android.presentation.screens.flowList.model
 
+import com.github.aivanovski.testwithme.android.entity.ErrorMessage
+
 sealed interface FlowListState {
 
     object NotInitialized : FlowListState
@@ -11,6 +13,6 @@ sealed interface FlowListState {
     ) : FlowListState
 
     data class Error(
-        val message: String
+        val message: ErrorMessage
     ) : FlowListState
 }

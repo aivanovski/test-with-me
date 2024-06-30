@@ -1,6 +1,6 @@
 - name: all.yaml
 
-- runFlow: about_open-screen.yaml
+- runFlow: Open about screen
 - runFlow: about_navigate-back.yaml
 - runFlow: new_db_create-new.yaml
 - runFlow: unlock_open-database.yaml

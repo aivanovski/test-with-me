@@ -1,10 +1,13 @@
 package com.github.aivanovski.testwithme.android.presentation
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.ui.platform.LocalContext
 import com.arkivanov.decompose.defaultComponentContext
+import com.github.aivanovski.testwithme.android.extensions.getParcelableCompat
 import com.github.aivanovski.testwithme.android.presentation.core.ThemeProviderImpl
 import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.AppTheme
 import com.github.aivanovski.testwithme.android.presentation.screens.root.RootScreenComponent
@@ -19,7 +22,8 @@ class MainActivity : ComponentActivity() {
             componentContext = defaultComponentContext(),
             onExitNavigation = {
                 finish()
-            }
+            },
+            args = getArguments()
         )
 
         setContent {
@@ -30,6 +34,26 @@ class MainActivity : ComponentActivity() {
                     rootComponent = component
                 )
             }
+        }
+    }
+
+    private fun getArguments(): StartArgs {
+        return intent.getParcelableCompat(ARGUMENTS, StartArgs::class.java)
+            ?: StartArgs.EMPTY
+    }
+
+    companion object {
+
+        private const val ARGUMENTS = "arguments"
+
+        fun createStartIntent(
+            context: Context,
+            args: StartArgs
+        ): Intent {
+            return Intent(context, MainActivity::class.java)
+                .apply {
+                    putExtra(ARGUMENTS, args)
+                }
         }
     }
 }

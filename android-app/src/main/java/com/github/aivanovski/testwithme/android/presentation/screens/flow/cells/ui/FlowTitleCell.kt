@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -21,6 +22,7 @@ import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.
 import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.ElementMargin
 import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.HalfMargin
 import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.LightTheme
+import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.QuarterMargin
 import com.github.aivanovski.testwithme.android.presentation.screens.flow.cells.model.FlowTitleCellIntent
 import com.github.aivanovski.testwithme.android.presentation.screens.flow.cells.model.FlowTitleCellModel
 import com.github.aivanovski.testwithme.android.presentation.screens.flow.cells.viewModel.FlowTitleCellViewModel
@@ -38,11 +40,11 @@ fun FlowTitleCell(viewModel: FlowTitleCellViewModel) {
     Card(
         shape = RoundedCornerShape(size = CardCornerSize),
         colors = CardDefaults.cardColors(
-            containerColor = AppTheme.theme.colors.primaryCardBackground
+            containerColor = AppTheme.theme.colors.cardOnSecondaryBackground
         ),
         modifier = Modifier
             .padding(
-                top = ElementMargin,
+                top = QuarterMargin,
                 start = ElementMargin,
                 end = ElementMargin
             )
@@ -71,7 +73,10 @@ fun FlowTitleCell(viewModel: FlowTitleCellViewModel) {
                 onClick = onRunClick,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = HalfMargin)
+                    .padding(top = HalfMargin),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = AppTheme.theme.colors.primaryButton
+                )
             ) {
                 Text(
                     text = stringResource(R.string.run_upper)
@@ -84,7 +89,10 @@ fun FlowTitleCell(viewModel: FlowTitleCellViewModel) {
 @Composable
 @Preview
 fun FlowTitleCellLightPreview() {
-    ThemedPreview(theme = LightTheme) {
+    ThemedPreview(
+        theme = LightTheme,
+        background = LightTheme.colors.secondaryBackground
+    ) {
         FlowTitleCell(
             viewModel = newTitleCellViewModel()
         )

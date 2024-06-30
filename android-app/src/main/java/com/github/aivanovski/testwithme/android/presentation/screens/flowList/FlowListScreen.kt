@@ -7,13 +7,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.github.aivanovski.testwithme.android.R
 import com.github.aivanovski.testwithme.android.presentation.core.compose.CenteredBox
 import com.github.aivanovski.testwithme.android.presentation.core.compose.ErrorMessage
 import com.github.aivanovski.testwithme.android.presentation.core.compose.ProgressIndicator
 import com.github.aivanovski.testwithme.android.presentation.core.compose.ThemedScreenPreview
+import com.github.aivanovski.testwithme.android.presentation.core.compose.dialogs.newErrorMessage
 import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.LightTheme
 import com.github.aivanovski.testwithme.android.presentation.screens.flowList.model.FlowItem
 import com.github.aivanovski.testwithme.android.presentation.screens.flowList.model.FlowListIntent
@@ -103,6 +102,9 @@ private fun newDataState(): FlowListState =
     )
 
 @Composable
-private fun newErrorState(): FlowListState =
-    FlowListState.Error(message = stringResource(R.string.error_has_been_occurred))
+private fun newErrorState(): FlowListState {
+    return FlowListState.Error(
+        message = newErrorMessage()
+    )
+}
 

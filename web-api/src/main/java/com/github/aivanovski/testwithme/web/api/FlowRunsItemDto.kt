@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class FlowRunsItemDto(
+    val uid: String,
     val flowUid: String,
     val userUid: String,
     val finishedAt: String,

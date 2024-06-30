@@ -2,7 +2,6 @@ package com.github.aivanovski.testwithme.android.domain.flow
 
 import android.view.accessibility.AccessibilityNodeInfo
 import arrow.core.raise.either
-import com.github.aivanovski.testwithme.android.domain.TestInteractor
 import com.github.aivanovski.testwithme.flow.driver.Driver
 import com.github.aivanovski.testwithme.flow.commands.CompositeStepCommand
 import com.github.aivanovski.testwithme.flow.commands.ExecutableStepCommand
@@ -16,11 +15,10 @@ import com.github.aivanovski.testwithme.android.entity.exception.FlowException
 import com.github.aivanovski.testwithme.flow.commands.StepCommand
 import kotlinx.coroutines.delay
 import arrow.core.Either
-import com.github.aivanovski.testwithme.extensions.unwrap
 import com.github.aivanovski.testwithme.extensions.unwrapError
 
 class CommandExecutor(
-    private val interactor: TestInteractor,
+    private val interactor: FlowRunnerInteractor,
     private val driver: Driver<AccessibilityNodeInfo>
 ) {
 
@@ -97,7 +95,7 @@ class CommandExecutor(
             throw IllegalStateException() // TODO: check
         }
 
-        val flow = interactor.getFlowByUid(compositeCommand.flowUid).bind()
+        var flow = interactor.getCachedFlowByUid(compositeCommand.flowUid).bind()
 
         lifecycleListener.onFlowStarted(flow.entry)
 
@@ -106,22 +104,17 @@ class CommandExecutor(
         while (commandIndex < commands.size) {
             delay(FlowRunner.DELAY_BETWEEN_STEPS)
 
+            flow = interactor.getCachedFlowByUid(compositeCommand.flowUid).bind()
             val command = commands[commandIndex]
 
             val stepUid = flow.steps[commandIndex].uid
-            val getStepResult = interactor.getStepByUid(stepUid)
-            if (getStepResult.isLeft()) {
-                lifecycleListener.onFlowFinished(flow.entry, getStepResult)
-                raise(getStepResult.unwrapError())
-            }
+            val stepEntry = flow.steps[commandIndex]
 
             val executionData = interactor.getExecutionData(
                 jobUid = job.uid,
                 flowUid = flow.entry.uid,
                 stepUid = stepUid
             ).bind()
-
-            val stepEntry = getStepResult.unwrap()
 
             lifecycleListener.onStepStarted(
                 flow.entry,

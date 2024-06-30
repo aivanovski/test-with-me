@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "fff713a33bb2179a1d4f58b986e123e0",
+    "identityHash": "2d044eb673219f989af9d3e75a3d171e",
     "entities": [
       {
         "tableName": "step_entry",
@@ -161,8 +161,8 @@
         "foreignKeys": []
       },
       {
-        "tableName": "execution_data",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `job_uid` TEXT NOT NULL, `flow_uid` TEXT NOT NULL, `step_uid` TEXT NOT NULL, `attempt_count` INTEGER NOT NULL, `result` TEXT)",
+        "tableName": "local_step_run",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `job_uid` TEXT NOT NULL, `flow_uid` TEXT NOT NULL, `step_uid` TEXT NOT NULL, `attempt_count` INTEGER NOT NULL, `is_last` INTEGER NOT NULL, `sync_status` TEXT NOT NULL, `result` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -195,6 +195,18 @@
             "notNull": true
           },
           {
+            "fieldPath": "isLast",
+            "columnName": "is_last",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "syncStatus",
+            "columnName": "sync_status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
             "fieldPath": "result",
             "columnName": "result",
             "affinity": "TEXT",
@@ -214,7 +226,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fff713a33bb2179a1d4f58b986e123e0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2d044eb673219f989af9d3e75a3d171e')"
     ]
   }
 }

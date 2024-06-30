@@ -48,7 +48,7 @@ fun RootScreen(
         ) { (_, component) ->
             Surface(
                 modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colorScheme.background
+                color = AppTheme.theme.colors.background
             ) {
                 CompositionLocalProvider(
                     LocalViewModelStoreOwner provides component as ViewModelStoreOwner
@@ -75,8 +75,8 @@ private fun RootScreen(
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AppTheme.theme.materialColors.primaryContainer,
-                    titleContentColor = AppTheme.theme.materialColors.primary,
+                    containerColor = AppTheme.theme.colors.background,
+                    titleContentColor = AppTheme.theme.colors.primaryText,
                 ),
                 title = {
                     Text(

@@ -9,13 +9,14 @@ import com.github.aivanovski.testwithme.android.presentation.core.decompose.View
 import com.github.aivanovski.testwithme.android.presentation.core.navigation.Router
 import com.github.aivanovski.testwithme.android.presentation.core.navigation.ScreenComponent
 import com.github.aivanovski.testwithme.android.presentation.screens.root.RootViewModel
+import com.github.aivanovski.testwithme.android.utils.LifecycleLogger
 
 class LoginScreenComponent(
-    component: ComponentContext,
+    context: ComponentContext,
     private val rootViewModel: RootViewModel,
     private val router: Router,
 ) : ScreenComponent,
-    ComponentContext by component,
+    ComponentContext by context,
     ViewModelStoreOwner by ViewModelStoreOwnerImpl() {
 
     private val viewModel: LoginViewModel by lazy {

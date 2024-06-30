@@ -111,7 +111,7 @@ class FlowListViewModel(
             } else {
                 emit(
                     FlowListState.Error(
-                        message = errorInteractor.getMessage(getFlowsResult.unwrapError())
+                        message = errorInteractor.formatMessage(getFlowsResult.unwrapError())
                     )
                 )
             }

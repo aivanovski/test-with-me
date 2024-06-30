@@ -35,7 +35,7 @@
   (request
     {:type :POST
      :endpoint "/login"
-     :headers (merge CONTENT_TYPE AUTH)
+     :headers CONTENT_TYPE
      :body (to-json {:username "admin", :password "abc123"})})
 
   "flow"
@@ -61,6 +61,9 @@
     {:type :GET
      :endpoint "/user"
      :headers AUTH})
+  
+  nil
+  (println "No arguments were specified")
   )
 
 (comment

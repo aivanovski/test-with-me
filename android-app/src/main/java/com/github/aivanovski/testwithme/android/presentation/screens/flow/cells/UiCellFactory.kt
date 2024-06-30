@@ -10,7 +10,9 @@ import com.github.aivanovski.testwithme.android.presentation.screens.flow.cells.
 import com.github.aivanovski.testwithme.android.presentation.screens.flow.cells.viewModel.FlowTitleCellViewModel
 import com.github.aivanovski.testwithme.android.presentation.core.cells.viewModel.HeaderCellViewModel
 import com.github.aivanovski.testwithme.android.presentation.core.cells.viewModel.SpaceCellViewModel
+import com.github.aivanovski.testwithme.android.presentation.screens.flow.cells.ui.EmptyHistoryCell
 import com.github.aivanovski.testwithme.android.presentation.screens.flow.cells.ui.HistoryItemCell
+import com.github.aivanovski.testwithme.android.presentation.screens.flow.cells.viewModel.EmptyHistoryCellViewModel
 import com.github.aivanovski.testwithme.android.presentation.screens.flow.cells.viewModel.HistoryItemCellViewModel
 
 class UiCellFactory {
@@ -23,6 +25,7 @@ class UiCellFactory {
             is HeaderCellViewModel -> HeaderCell(viewModel)
             is SpaceCellViewModel -> SpaceCell(viewModel)
             is HistoryItemCellViewModel -> HistoryItemCell(viewModel)
+            is EmptyHistoryCellViewModel -> EmptyHistoryCell(viewModel)
             else -> throw IllegalStateException()
         }
     }

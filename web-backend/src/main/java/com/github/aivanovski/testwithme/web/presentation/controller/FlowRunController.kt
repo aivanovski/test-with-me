@@ -9,6 +9,7 @@ import com.github.aivanovski.testwithme.web.api.response.FlowRunsResponse
 import com.github.aivanovski.testwithme.web.data.repository.FlowRunRepository
 import com.github.aivanovski.testwithme.web.data.repository.FlowRepository
 import com.github.aivanovski.testwithme.web.data.repository.ProjectRepository
+import com.github.aivanovski.testwithme.web.entity.CompoundUid
 import com.github.aivanovski.testwithme.web.entity.ErrorResponse
 import com.github.aivanovski.testwithme.web.entity.Timestamp
 import com.github.aivanovski.testwithme.web.entity.Uid
@@ -43,6 +44,7 @@ class FlowRunController(
 
         val items = filteredStats.map { flowRun ->
             FlowRunsItemDto(
+                uid = flowRun.uid.toString(),
                 flowUid = flowRun.flowUid.toString(),
                 userUid = flowRun.userUid.toString(),
                 finishedAt = flowRun.timestamp.formatForTransport(),
@@ -68,6 +70,7 @@ class FlowRunController(
             ?: raise(FlowNotFoundByUidException(flowUid.toString()).toErrorResponse())
 
         val flowRun = FlowRun(
+            uid = CompoundUid.generateFrom(flowUid, user.uid),
             flowUid = flow.uid,
             userUid = user.uid,
             timestamp = Timestamp.now(),
@@ -80,6 +83,9 @@ class FlowRunController(
             .transformError()
             .bind()
 
-        PostFlowRunResponse(true)
+        PostFlowRunResponse(
+            id = flow.uid.toString(),
+            isAccepted = true
+        )
     }
 }

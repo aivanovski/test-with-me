@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.github.aivanovski.testwithme.android.presentation.core.IntentProvider
 import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.AppTheme
 import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.Theme
@@ -13,6 +14,7 @@ import com.github.aivanovski.testwithme.android.presentation.core.compose.theme.
 @Composable
 fun ThemedPreview(
     theme: Theme,
+    background: Color = theme.colors.background,
     content: @Composable () -> Unit
 ) {
     AppTheme(theme = theme) {
@@ -20,7 +22,7 @@ fun ThemedPreview(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    color = AppTheme.theme.colors.background
+                    color = background
                 )
         ) {
             content.invoke()
@@ -31,6 +33,7 @@ fun ThemedPreview(
 @Composable
 fun ThemedScreenPreview(
     theme: Theme,
+    background: Color = theme.colors.background,
     content: @Composable () -> Unit
 ) {
     AppTheme(theme = theme) {
@@ -38,7 +41,7 @@ fun ThemedScreenPreview(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    color = AppTheme.theme.colors.background
+                    color = background
                 )
         ) {
             content.invoke()

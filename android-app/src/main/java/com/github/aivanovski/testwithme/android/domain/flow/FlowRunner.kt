@@ -1,10 +1,11 @@
 package com.github.aivanovski.testwithme.android.domain.flow
 
+import android.content.Context
+import android.content.Intent
 import android.view.accessibility.AccessibilityNodeInfo
 import arrow.core.raise.either
 import com.github.aivanovski.testwithme.android.data.Settings
 import com.github.aivanovski.testwithme.android.entity.OnStepFinishedAction
-import com.github.aivanovski.testwithme.android.domain.TestInteractor
 import com.github.aivanovski.testwithme.flow.driver.Driver
 import com.github.aivanovski.testwithme.android.entity.OnFinishAction
 import com.github.aivanovski.testwithme.android.entity.JobStatus
@@ -20,11 +21,15 @@ import timber.log.Timber
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import arrow.core.Either
+import com.github.aivanovski.testwithme.android.presentation.MainActivity
+import com.github.aivanovski.testwithme.android.presentation.StartArgs
+import com.github.aivanovski.testwithme.extensions.unwrap
 import com.github.aivanovski.testwithme.extensions.unwrapError
 
 class FlowRunner(
+    private val context: Context,
     private val settings: Settings,
-    private val interactor: TestInteractor,
+    private val interactor: FlowRunnerInteractor,
     driver: Driver<AccessibilityNodeInfo>
 ) {
 
@@ -73,10 +78,30 @@ class FlowRunner(
     ): Either<AppException, String?> = either {
         val jobs = interactor.getJobs().bind()
 
-        Timber.d("jobs: size=%s, %s", jobs.size, jobs)
-
         val running = jobs.filterByStatus(JobStatus.RUNNING)
         val pending = jobs.filterByStatus(JobStatus.PENDING)
+
+        val cancelledUids = jobs
+            .filterByStatus(JobStatus.CANCELLED)
+            .map { job -> job.uid }
+
+        val finishedUids = jobs
+            .filterByStatus(JobStatus.FINISHED)
+            .map { job -> job.uid }
+
+        if (targetJobUid in cancelledUids || targetJobUid in finishedUids) {
+            settings.startJobUid = null
+        }
+
+        Timber.d(
+            "jobs: size=%s, running=%s, pending=%s",
+            jobs.size,
+            running.size,
+            pending.size
+        )
+        for (job in jobs) {
+            Timber.d("    %s", job)
+        }
 
         if (running.isNotEmpty() && isIdle()) {
             for (job in running) {
@@ -111,7 +136,7 @@ class FlowRunner(
         val job = jobs.firstOrNull { job -> job.uid == jobUid }
             ?: raise(AppException("Failed to find job by uid: $jobUid"))
 
-        val flow = interactor.getFlowByUid(job.flowUid).bind()
+        val flow = interactor.getCachedFlowByUid(job.flowUid).bind()
 
         jobUidRef.set(jobUid)
         stateRef.set(RunnerState.RUNNING)
@@ -127,7 +152,7 @@ class FlowRunner(
         notifyOnFlowStarted(flow.entry)
 
         runCurrentStep(
-            initialDelay = 5000L
+            initialDelay = 1500L
         ).bind()
     }
 
@@ -167,7 +192,7 @@ class FlowRunner(
 
         val command = commandFactory.createCommand(stepEntry.command).bind()
 
-        val nextAction = commandExecutor.execute(
+        val nextActionResult = commandExecutor.execute(
             job = job,
             flow = flow.entry,
             stepEntry = stepEntry,
@@ -175,8 +200,17 @@ class FlowRunner(
             stepIndex = stepIndex.get(),
             attemptIndex = executionData.attemptCount,
             lifecycleListener = listeners.first()
-        ).bind()
+        )
+        if (nextActionResult.isLeft()) {
+            finishFlowExecution(
+                jobUid = job.uid,
+                isRunNextAllowed = false
+            ).bind()
 
+            return@either
+        }
+
+        val nextAction = nextActionResult.unwrap()
         when (nextAction) {
             is OnStepFinishedAction.Next -> {
                 stepIndex.incrementAndGet()
@@ -213,13 +247,28 @@ class FlowRunner(
 
         val job = interactor.getJobByUid(jobUid).bind()
 
-        interactor.removeJob(jobUid).bind()
+        interactor.updateJob(
+            job.copy(
+                status = JobStatus.FINISHED
+            )
+        ).bind()
 
+        val uploadResult = interactor.uploadJobResult(job.uid)
+        val isUploadedSuccessfully = uploadResult.isRight()
         val isRunNext = (job.onFinishAction == OnFinishAction.RUN_NEXT)
-        if (isRunNext && isRunNextAllowed) {
+        if (isRunNext && isRunNextAllowed && isUploadedSuccessfully) {
             scope.launch {
                 runNextFlow()
             }
+        } else {
+            val intent = MainActivity.createStartIntent(
+                context = context,
+                args = StartArgs(
+                    flowUid = job.flowUid
+                )
+            )
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
         }
     }
 
@@ -230,37 +279,6 @@ class FlowRunner(
             listener.onFlowStarted(flow)
         }
     }
-
-    // private fun notifyOnFlowFinished(
-    //     flow: FlowEntry,
-    //     result: Either<AppException, Any>
-    // ) {
-    //     for (listener in listeners) {
-    //         listener.onFlowFinished(flow, result)
-    //     }
-    // }
-
-    // private fun notifyOnStepStarted(
-    //     flow: FlowEntry,
-    //     command: StepCommand,
-    //     stepIndex: Int,
-    //     attemptIndex: Int
-    // ) {
-    //     for (listener in listeners) {
-    //         listener.onStepStarted(flow, command, stepIndex, attemptIndex)
-    //     }
-    // }
-
-    // private fun notifyOnStepFinished(
-    //     flow: FlowEntry,
-    //     command: StepCommand,
-    //     stepIndex: Int,
-    //     result: Either<AppException, Any>
-    // ) {
-    //     for (listener in listeners) {
-    //         listener.onStepFinished(flow, command, stepIndex, result)
-    //     }
-    // }
 
     private fun List<JobEntry>.filterByStatus(
         status: JobStatus

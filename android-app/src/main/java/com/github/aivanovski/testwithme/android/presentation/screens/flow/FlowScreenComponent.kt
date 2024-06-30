@@ -10,14 +10,15 @@ import com.github.aivanovski.testwithme.android.presentation.core.navigation.Rou
 import com.github.aivanovski.testwithme.android.presentation.core.navigation.ScreenComponent
 import com.github.aivanovski.testwithme.android.presentation.screens.flow.model.FlowScreenArgs
 import com.github.aivanovski.testwithme.android.presentation.screens.root.RootViewModel
+import com.github.aivanovski.testwithme.android.utils.LifecycleLogger
 
 class FlowScreenComponent(
-    component: ComponentContext,
+    context: ComponentContext,
     private val rootViewModel: RootViewModel,
     private val router: Router,
     args: FlowScreenArgs
 ) : ScreenComponent,
-    ComponentContext by component,
+    ComponentContext by context,
     ViewModelStoreOwner by ViewModelStoreOwnerImpl() {
 
     private val viewModel: FlowViewModel by lazy {

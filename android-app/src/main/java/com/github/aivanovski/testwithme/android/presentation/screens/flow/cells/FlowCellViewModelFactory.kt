@@ -8,9 +8,11 @@ import com.github.aivanovski.testwithme.android.presentation.core.cells.model.He
 import com.github.aivanovski.testwithme.android.presentation.core.cells.model.SpaceCellModel
 import com.github.aivanovski.testwithme.android.presentation.core.cells.viewModel.HeaderCellViewModel
 import com.github.aivanovski.testwithme.android.presentation.core.cells.viewModel.SpaceCellViewModel
+import com.github.aivanovski.testwithme.android.presentation.screens.flow.cells.model.EmptyHistoryCellModel
 import com.github.aivanovski.testwithme.android.presentation.screens.flow.cells.model.FlowStatsCellModel
 import com.github.aivanovski.testwithme.android.presentation.screens.flow.cells.model.FlowTitleCellModel
 import com.github.aivanovski.testwithme.android.presentation.screens.flow.cells.model.HistoryItemCellModel
+import com.github.aivanovski.testwithme.android.presentation.screens.flow.cells.viewModel.EmptyHistoryCellViewModel
 import com.github.aivanovski.testwithme.android.presentation.screens.flow.cells.viewModel.FlowStatsCellViewModel
 import com.github.aivanovski.testwithme.android.presentation.screens.flow.cells.viewModel.FlowTitleCellViewModel
 import com.github.aivanovski.testwithme.android.presentation.screens.flow.cells.viewModel.HistoryItemCellViewModel
@@ -27,6 +29,7 @@ class FlowCellViewModelFactory : CellViewModelFactory {
             is HeaderCellModel -> HeaderCellViewModel(model, intentProvider)
             is SpaceCellModel -> SpaceCellViewModel(model)
             is HistoryItemCellModel -> HistoryItemCellViewModel(model, intentProvider)
+            is EmptyHistoryCellModel -> EmptyHistoryCellViewModel(model)
             else -> throwUnsupportedModelException(model)
         }
     }

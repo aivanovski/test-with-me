@@ -3,11 +3,10 @@ package com.github.aivanovski.testwithme.android.entity.db
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.github.aivanovski.testwithme.android.entity.SyncStatus
 
-// TODO: should be StepExecutionData
-
-@Entity("execution_data")
-data class ExecutionData(
+@Entity("local_step_run")
+data class LocalStepRun(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo("id")
     val id: Long? = null,
@@ -23,6 +22,12 @@ data class ExecutionData(
 
     @ColumnInfo("attempt_count")
     val attemptCount: Int,
+
+    @ColumnInfo("is_last")
+    val isLast: Boolean,
+
+    @ColumnInfo("sync_status")
+    val syncStatus: SyncStatus,
 
     @ColumnInfo("result")
     val result: String?

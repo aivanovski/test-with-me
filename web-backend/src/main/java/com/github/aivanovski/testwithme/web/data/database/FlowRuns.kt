@@ -1,5 +1,6 @@
 package com.github.aivanovski.testwithme.web.data.database
 
+import com.github.aivanovski.testwithme.web.entity.CompoundUid
 import com.github.aivanovski.testwithme.web.entity.Timestamp
 import com.github.aivanovski.testwithme.web.entity.Uid
 import com.github.aivanovski.testwithme.web.entity.FlowRun
@@ -12,6 +13,7 @@ import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.transactions.transaction
 
 object FlowRunsTable : LongIdTable() {
+    val uid = varchar("uid", 128)
     val flowUid = varchar("flow_uid", 64)
     val userUid = varchar("user_uid", 64)
     val timestamp = varchar("timestamp", 32)
@@ -21,6 +23,7 @@ object FlowRunsTable : LongIdTable() {
 }
 
 class FlowRunEntity(id: EntityID<Long>) : Entity<Long>(id) {
+    var uid by FlowRunsTable.uid
     var flowUid by FlowRunsTable.flowUid
     var userUid by FlowRunsTable.userUid
     var timestamp by FlowRunsTable.timestamp
@@ -39,6 +42,7 @@ class FlowRunDao {
 
     fun insert(flowRun: FlowRun): FlowRun = transaction {
         FlowRunEntity.new {
+            uid = flowRun.uid.toString()
             flowUid = flowRun.flowUid.toString()
             userUid = flowRun.userUid.toString()
             timestamp = flowRun.timestamp.toString()
@@ -51,6 +55,7 @@ class FlowRunDao {
     private fun FlowRunEntity.readRow(): FlowRun {
         return FlowRun(
             id = id.value,
+            uid = CompoundUid(uid),
             flowUid = Uid.fromString(flowUid),
             userUid = Uid.fromString(userUid),
             timestamp = Timestamp.fromString(timestamp),

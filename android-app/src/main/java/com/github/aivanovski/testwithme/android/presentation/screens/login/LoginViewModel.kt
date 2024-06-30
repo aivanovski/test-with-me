@@ -14,7 +14,6 @@ import com.github.aivanovski.testwithme.android.presentation.screens.root.RootVi
 import com.github.aivanovski.testwithme.android.presentation.screens.root.model.RootIntent
 import com.github.aivanovski.testwithme.android.presentation.screens.root.model.TopBarState
 import com.github.aivanovski.testwithme.extensions.unwrapError
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +24,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.koin.core.parameter.parametersOf
-import timber.log.Timber
 
 class LoginViewModel(
     private val interactor: LoginInteractor,
@@ -135,7 +133,7 @@ class LoginViewModel(
             } else {
                 emit(
                     currentState.copy(
-                        errorMessage = errorInteractor.getMessage(response.unwrapError())
+                        errorMessage = errorInteractor.formatMessage(response.unwrapError())
                     )
                 )
             }

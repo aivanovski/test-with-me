@@ -5,20 +5,20 @@ import android.content.Context
 import android.content.Intent
 import arrow.core.raise.either
 import com.github.aivanovski.testwithme.android.di.GlobalInjector
-import com.github.aivanovski.testwithme.android.domain.TestInteractor
+import com.github.aivanovski.testwithme.android.domain.flow.FlowRunnerInteractor
 import com.github.aivanovski.testwithme.android.entity.exception.AppException
 import com.github.aivanovski.testwithme.android.utils.Base64Utils
-import com.github.aivanovski.testwithme.android.utils.StringUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import arrow.core.Either
 import com.github.aivanovski.testwithme.extensions.unwrapError
+import com.github.aivanovski.testwithme.utils.StringUtils
 
 class TestFlowBroadcastReceiver : BroadcastReceiver() {
 
-    private val testInteractor: TestInteractor by GlobalInjector.inject()
+    private val testInteractor: FlowRunnerInteractor by GlobalInjector.inject()
     private val scope = CoroutineScope(Dispatchers.IO)
 
     override fun onReceive(context: Context?, intent: Intent?) {

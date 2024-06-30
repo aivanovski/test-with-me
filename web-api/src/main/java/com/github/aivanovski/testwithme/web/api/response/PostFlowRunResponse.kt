@@ -4,5 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PostFlowRunResponse(
-    val isSuccess: Boolean
+    val id: String,
+    val isAccepted: Boolean
 )

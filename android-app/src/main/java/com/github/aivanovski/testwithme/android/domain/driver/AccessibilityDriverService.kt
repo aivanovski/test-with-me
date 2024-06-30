@@ -1,4 +1,4 @@
-package com.github.aivanovski.testwithme.android
+package com.github.aivanovski.testwithme.android.domain.driver
 
 import android.accessibilityservice.AccessibilityService
 import android.content.ComponentName
@@ -7,26 +7,28 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.view.accessibility.AccessibilityEvent
+import com.github.aivanovski.testwithme.android.NotificationService
 import com.github.aivanovski.testwithme.android.data.Settings
 import com.github.aivanovski.testwithme.android.di.GlobalInjector.inject
-import com.github.aivanovski.testwithme.android.domain.TestInteractor
+import com.github.aivanovski.testwithme.android.domain.driver.model.DriverState
+import com.github.aivanovski.testwithme.android.domain.flow.FlowRunnerInteractor
 import com.github.aivanovski.testwithme.android.domain.flow.AccessibilityDriverImpl
 import com.github.aivanovski.testwithme.android.domain.flow.FlowRunner
-import com.github.aivanovski.testwithme.entity.Duration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.concurrent.atomic.AtomicReference
 
 class AccessibilityDriverService : AccessibilityService() {
 
     private val settings: Settings by inject()
-    private val interactor: TestInteractor by inject()
+    private val interactor: FlowRunnerInteractor by inject()
 
     private val driver = AccessibilityDriverImpl(this, this)
-    private val runner = FlowRunner(settings, interactor, driver)
+    private val runner = FlowRunner(this, settings, interactor, driver)
     private var serviceConnection: ServiceConnection? = null
     private var timerJob: Job? = null
     private val scopeJob = Job()
@@ -42,6 +44,8 @@ class AccessibilityDriverService : AccessibilityService() {
     override fun onCreate() {
         super.onCreate()
         Timber.d("onCreate:")
+
+        state.set(DriverState.RUNNING)
 
         val serviceConnection = object : ServiceConnection {
 
@@ -117,6 +121,7 @@ class AccessibilityDriverService : AccessibilityService() {
     override fun onDestroy() {
         super.onDestroy()
         Timber.d("onDestroy:")
+        state.set(DriverState.STOPPED)
         runner.stop()
         scopeJob.cancel()
 
@@ -131,6 +136,8 @@ class AccessibilityDriverService : AccessibilityService() {
 
     companion object {
 
-        private val JOB_CHECK_DELAY = Duration.seconds(10)
+        private val state = AtomicReference<DriverState>(DriverState.STOPPED)
+
+        fun getState(): DriverState = state.get()
     }
 }

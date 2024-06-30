@@ -1,5 +1,7 @@
 package com.github.aivanovski.testwithme.android.presentation.screens.login.model
 
+import com.github.aivanovski.testwithme.android.entity.ErrorMessage
+
 sealed interface LoginState {
 
     object NotInitialized : LoginState
@@ -10,6 +12,6 @@ sealed interface LoginState {
         val username: String,
         val password: String,
         val isPasswordVisible: Boolean,
-        val errorMessage: String?
+        val errorMessage: ErrorMessage?
     ) : LoginState
 }

@@ -1,26 +1,27 @@
 package com.github.aivanovski.testwithme.android.di
 
 import com.github.aivanovski.testwithme.android.data.repository.FlowRepository
-import com.github.aivanovski.testwithme.android.data.repository.FlowRepositoryImpl
 import com.github.aivanovski.testwithme.android.data.Settings
 import com.github.aivanovski.testwithme.android.data.SettingsImpl
 import com.github.aivanovski.testwithme.android.data.api.ApiClient
 import com.github.aivanovski.testwithme.android.data.api.HttpRequestExecutor
 import com.github.aivanovski.testwithme.android.data.db.AppDatabase
-import com.github.aivanovski.testwithme.android.data.db.dao.ExecutionDataDao
+import com.github.aivanovski.testwithme.android.data.db.dao.LocalStepRunDao
 import com.github.aivanovski.testwithme.android.data.db.dao.FlowEntryDao
 import com.github.aivanovski.testwithme.android.data.db.dao.JobDao
 import com.github.aivanovski.testwithme.android.data.db.dao.StepEntryDao
-import com.github.aivanovski.testwithme.android.data.repository.ExecutionDataRepository
+import com.github.aivanovski.testwithme.android.data.repository.StepRunRepository
 import com.github.aivanovski.testwithme.android.data.repository.FlowRunRepository
 import com.github.aivanovski.testwithme.android.data.repository.JobRepository
 import com.github.aivanovski.testwithme.android.data.repository.ProjectRepository
+import com.github.aivanovski.testwithme.android.data.repository.UserRepository
 import com.github.aivanovski.testwithme.android.domain.ErrorInteractor
-import com.github.aivanovski.testwithme.android.domain.TestInteractor
+import com.github.aivanovski.testwithme.android.domain.flow.FlowRunnerInteractor
 import com.github.aivanovski.testwithme.android.domain.resources.ResourceProvider
 import com.github.aivanovski.testwithme.android.domain.resources.ResourceProviderImpl
 import com.github.aivanovski.testwithme.android.domain.usecases.GetCurrentJobUseCase
 import com.github.aivanovski.testwithme.android.domain.usecases.ParseFlowFileUseCase
+import com.github.aivanovski.testwithme.android.presentation.StartArgs
 import com.github.aivanovski.testwithme.android.presentation.core.navigation.Router
 import com.github.aivanovski.testwithme.android.presentation.screens.flow.FlowInteractor
 import com.github.aivanovski.testwithme.android.presentation.screens.flow.FlowViewModel
@@ -58,11 +59,12 @@ object AndroidAppModule {
         single { ApiClient(get(), get()) }
 
         // Repositories
-        single<FlowRepository> { FlowRepositoryImpl(get(), get(), get(), get()) }
+        single { FlowRepository(get(), get(), get(), get()) }
         single { JobRepository(get()) }
-        single { ExecutionDataRepository(get()) }
+        single { StepRunRepository(get(), get()) }
         single { ProjectRepository(get()) }
         single { FlowRunRepository(get()) }
+        single { UserRepository(get()) }
 
         // UseCases
         single { ParseFlowFileUseCase() }
@@ -70,17 +72,24 @@ object AndroidAppModule {
 
         // Interactors
         single { ErrorInteractor(get()) }
-        single { TestInteractor(get(), get(), get(), get(), get(), get()) }
+        single { FlowRunnerInteractor(get(), get(), get(), get(), get(), get(), get()) }
         single { LoginInteractor(get(), get()) }
         single { FlowListInteractor(get()) }
-        single { FlowInteractor(get(), get(), get()) }
+        single { FlowInteractor(get(), get(), get(), get(), get()) }
 
         // Cell factories
         single { FlowCellModelFactory(get()) }
         single { FlowCellViewModelFactory() }
 
         // ViewModels
-        factory { (router: Router) -> RootViewModel(get(), router) }
+        factory { (router: Router, args: StartArgs) ->
+            RootViewModel(
+                get(),
+                get(),
+                router,
+                args
+            )
+        }
         factory { (vm: RootViewModel, router: Router) ->
             LoginViewModel(get(), get(), vm, router)
         }
@@ -89,6 +98,8 @@ object AndroidAppModule {
         }
         factory { (vm: RootViewModel, router: Router, args: FlowScreenArgs) ->
             FlowViewModel(
+                get(),
+                get(),
                 get(),
                 get(),
                 get(),
@@ -105,7 +116,7 @@ object AndroidAppModule {
 
     private fun provideRunnerEntryDao(db: AppDatabase): JobDao = db.runnerEntryDao
 
-    private fun provideExecutionEntryDao(db: AppDatabase): ExecutionDataDao =
+    private fun provideExecutionEntryDao(db: AppDatabase): LocalStepRunDao =
         db.executionDataDao
 
     private fun provideHttpRequestExecutor(): HttpRequestExecutor {
