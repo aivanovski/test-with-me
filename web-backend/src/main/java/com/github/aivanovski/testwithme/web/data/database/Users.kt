@@ -28,9 +28,10 @@ class UserDao {
         UserEntity.all().map { it.convertToUser() }
     }
 
-    fun findByUid(uid: String): List<User> = transaction {
+    fun findByUid(uid: String): User? = transaction {
         UserEntity.find { (UsersTable.uid eq uid) }
             .map { it.convertToUser() }
+            .firstOrNull()
     }
 
     fun findByName(name: String): List<User> = transaction {

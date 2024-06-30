@@ -108,8 +108,8 @@ class ApiClient(
         response.flows.map { flow ->
             FlowEntry(
                 id = null,
-                uid = flow.uid,
-                projectUid = flow.projectUid,
+                uid = flow.id,
+                projectUid = flow.projectId,
                 name = flow.name,
                 sourceType = FlowSourceType.REMOTE
             )

@@ -18,11 +18,13 @@ data class Uid(
             return Uid(UUID(least, most))
         }
 
-        fun userUid(value: Long): Uid = fromLong(100, value)
+        fun userUid(value: Long): Uid = fromLong(64, value)
 
-        fun projectUid(value: Long): Uid = fromLong(1000, value)
+        fun projectUid(value: Long): Uid = fromLong(128, value)
 
-        fun flowUid(value: Long): Uid = fromLong(10_000, value)
+        fun groupUid(value: Long): Uid = fromLong(256, value)
+
+        fun flowUid(value: Long): Uid = fromLong(1024, value)
 
         fun fromString(value: String): Uid {
             return Uid(UUID.fromString(value))

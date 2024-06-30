@@ -3,10 +3,9 @@ package com.github.aivanovski.testwithme.web.api
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class FlowItemDto(
+data class GroupsItemDto(
     val id: String,
+    val parentId: String?,
     val projectId: String,
-    val groupId: String?,
-    val name: String,
-    val base64Content: String
+    val name: String
 )

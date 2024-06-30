@@ -13,15 +13,12 @@ import com.github.aivanovski.testwithme.web.api.FlowsItemDto
 import com.github.aivanovski.testwithme.web.api.response.FlowResponse
 import com.github.aivanovski.testwithme.web.api.response.FlowsResponse
 import com.github.aivanovski.testwithme.web.data.file.FlowContentProvider
-import com.github.aivanovski.testwithme.web.data.repository.ProjectRepository
 import com.github.aivanovski.testwithme.web.entity.Uid
 import com.github.aivanovski.testwithme.web.entity.exception.FlowNotFoundByUidException
-import com.github.aivanovski.testwithme.web.entity.exception.ProjectNotFoundByUidException
 import com.github.aivanovski.testwithme.web.extensions.encodeToBase64
 
 class FlowController(
     private val flowRepository: FlowRepository,
-    private val projectRepository: ProjectRepository,
     private val flowContentProvider: FlowContentProvider
 ) {
 
@@ -42,19 +39,15 @@ class FlowController(
         }
 
         val flow = flows.first()
-        val project = projectRepository.findByUid(flow.projectUid)
-            .mapLeft { error -> error.toErrorResponse() }
-            .bind()
-            ?: raise(ProjectNotFoundByUidException(flow.projectUid).toErrorResponse())
-
         val rawContent = flowContentProvider.getContent(flow.path)
             .mapLeft { error -> error.toErrorResponse() }
             .bind()
 
         FlowResponse(
             FlowItemDto(
-                uid = flow.uid.toString(),
-                projectUid = project.uid.toString(),
+                id = flow.uid.toString(),
+                projectId = flow.projectUid.toString(),
+                groupId = flow.groupUid?.toString(),
                 name = flow.name,
                 base64Content = rawContent.encodeToBase64()
             )
@@ -70,8 +63,9 @@ class FlowController(
 
         val items = flows.map { flow ->
             FlowsItemDto(
-                uid = flow.uid.toString(),
-                projectUid = flow.projectUid.toString(),
+                id = flow.uid.toString(),
+                projectId = flow.projectUid.toString(),
+                groupId = flow.groupUid?.toString(),
                 name = flow.name
             )
         }

@@ -1,10 +1,9 @@
 package com.github.aivanovski.testwithme.web.entity
 
-data class Flow(
+data class Group(
     val id: Long? = null,
     val uid: Uid,
+    val parentUid: Uid?,
     val projectUid: Uid,
-    val groupUid: Uid?,
-    val name: String,
-    val path: String
+    val name: String
 )

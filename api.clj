@@ -61,6 +61,12 @@
     {:type :GET
      :endpoint "/user"
      :headers AUTH})
+
+  "group"
+  (request 
+    {:type :GET
+     :endpoint "/group"
+     :headers AUTH})
   
   nil
   (println "No arguments were specified")

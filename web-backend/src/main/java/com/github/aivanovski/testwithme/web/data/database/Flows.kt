@@ -11,6 +11,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 object FlowsTable : LongIdTable() {
     val uid = varchar("uid", 64)
     val projectUid = varchar("project_uid", 64)
+    val groupUid = varchar("group_uid", 64).nullable()
     val name = varchar("name", 128)
     val path = varchar("path", 128)
 }
@@ -18,6 +19,7 @@ object FlowsTable : LongIdTable() {
 class FlowEntity(id: EntityID<Long>) : Entity<Long>(id) {
     var uid by FlowsTable.uid
     var projectUid by FlowsTable.projectUid
+    var groupUid by FlowsTable.groupUid
     var name by FlowsTable.name
     var path by FlowsTable.path
 
@@ -41,6 +43,7 @@ class FlowDao {
         FlowEntity.new {
             uid = flow.uid.toString()
             projectUid = flow.projectUid.toString()
+            groupUid = flow.groupUid?.toString()
             name = flow.name
             path = flow.path
         }.readRow()
@@ -51,6 +54,7 @@ class FlowDao {
             id = id.value,
             uid = Uid.fromString(uid),
             projectUid = Uid.fromString(projectUid),
+            groupUid = groupUid?.let { Uid.fromString(it) },
             name = name,
             path = path
         )

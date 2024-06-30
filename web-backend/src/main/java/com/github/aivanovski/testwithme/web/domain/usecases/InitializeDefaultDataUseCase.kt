@@ -3,9 +3,11 @@ package com.github.aivanovski.testwithme.web.domain.usecases
 import arrow.core.Either
 import arrow.core.raise.either
 import com.github.aivanovski.testwithme.web.data.repository.FlowRepository
+import com.github.aivanovski.testwithme.web.data.repository.GroupRepository
 import com.github.aivanovski.testwithme.web.data.repository.ProjectRepository
 import com.github.aivanovski.testwithme.web.data.repository.UserRepository
 import com.github.aivanovski.testwithme.web.entity.Flow
+import com.github.aivanovski.testwithme.web.entity.Group
 import com.github.aivanovski.testwithme.web.entity.Project
 import com.github.aivanovski.testwithme.web.entity.Uid
 import com.github.aivanovski.testwithme.web.entity.User
@@ -14,29 +16,39 @@ import com.github.aivanovski.testwithme.web.entity.exception.AppException
 class InitializeDefaultDataUseCase(
     private val userRepository: UserRepository,
     private val projectRepository: ProjectRepository,
-    private val flowRepository: FlowRepository
+    private val flowRepository: FlowRepository,
+    private val groupRepository: GroupRepository
 ) {
 
     fun initializeDefaultDataIfNeed(): Either<AppException, Unit> = either {
         val allUsers = userRepository.getUsers().bind()
-        var defaultUser = allUsers.firstOrNull { user -> user.uid == DEFAULT_USER.uid }
+        val defaultUser = allUsers.firstOrNull { user -> user.uid == DEFAULT_USER.uid }
         if (defaultUser == null) {
             userRepository.add(DEFAULT_USER).bind()
         }
 
         val allProjects = projectRepository.getAll().bind()
-        var defaultProject = allProjects.firstOrNull { project ->
+        val defaultProject = allProjects.firstOrNull { project ->
             project.uid == DEFAULT_PROJECT.uid
         }
         if (defaultProject == null) {
             projectRepository.add(DEFAULT_PROJECT).bind()
         }
 
+        val allGroupsMap = groupRepository.getByUserUid(DEFAULT_USER.uid).bind()
+            .associateBy { group -> group.uid }
+
+        for (group in DEFAULT_GROUPS) {
+            if (group.uid !in allGroupsMap) {
+                groupRepository.insert(group)
+            }
+        }
+
         val allFlowsMap = flowRepository.getFlowsByUserUid(DEFAULT_USER.uid).bind()
             .associateBy { flow -> flow.uid }
 
         for (flow in DEFAULT_FLOWS) {
-            if (!allFlowsMap.containsKey(flow.uid)) {
+            if (flow.uid !in allFlowsMap) {
                 flowRepository.add(flow).bind()
             }
         }
@@ -46,6 +58,11 @@ class InitializeDefaultDataUseCase(
 
         private val USER_UID = Uid.userUid(1)
         private val PROJECT_UID = Uid.projectUid(1)
+        private val SCREENS_GROUP_UID = Uid.groupUid(1)
+        private val OTHERS_GROUP_UID = Uid.groupUid(2)
+        private val ABOUT_GROUP_UID = Uid.groupUid(3)
+        private val UNLOCK_GROUP_UID = Uid.groupUid(4)
+        private val NEW_DATABASE_GROUP_UID = Uid.groupUid(5)
 
         private val DEFAULT_USER = User(
             uid = USER_UID,
@@ -59,40 +76,79 @@ class InitializeDefaultDataUseCase(
             name = "KeePassVault"
         )
 
+        private val DEFAULT_GROUPS = listOf(
+            Group(
+                uid = SCREENS_GROUP_UID,
+                parentUid = null,
+                projectUid = PROJECT_UID,
+                name = "Screens"
+            ),
+            Group(
+                uid = OTHERS_GROUP_UID,
+                parentUid = null,
+                projectUid = PROJECT_UID,
+                name = "Others"
+            ),
+            Group(
+                uid = UNLOCK_GROUP_UID,
+                parentUid = null,
+                projectUid = PROJECT_UID,
+                name = "Unlock"
+            ),
+            Group(
+                uid = ABOUT_GROUP_UID,
+                parentUid = null,
+                projectUid = PROJECT_UID,
+                name = "About"
+            ),
+            Group(
+                uid = NEW_DATABASE_GROUP_UID,
+                parentUid = null,
+                projectUid = PROJECT_UID,
+                name = "New Database"
+            )
+        )
+
         private val DEFAULT_FLOWS = listOf(
             Flow(
                 uid = Uid.flowUid(1),
                 projectUid = PROJECT_UID,
+                groupUid = ABOUT_GROUP_UID,
                 name = "Navigate back from about screen",
                 path = "keepassvault/about_navigate-back.yaml"
             ),
             Flow(
                 uid = Uid.flowUid(2),
                 projectUid = PROJECT_UID,
+                groupUid = ABOUT_GROUP_UID,
                 name = "Open about screen",
                 path = "keepassvault/about_open-screen.yaml"
             ),
             Flow(
                 uid = Uid.flowUid(3),
                 projectUid = PROJECT_UID,
+                groupUid = NEW_DATABASE_GROUP_UID,
                 name = "Create new database",
                 path = "keepassvault/new_db_create-new.yaml"
             ),
             Flow(
                 uid = Uid.flowUid(4),
                 projectUid = PROJECT_UID,
+                groupUid = UNLOCK_GROUP_UID,
                 name = "Unlock database",
                 path = "keepassvault/unlock_open-database.yaml"
             ),
             Flow(
                 uid = Uid.flowUid(5),
                 projectUid = PROJECT_UID,
+                groupUid = UNLOCK_GROUP_UID,
                 name = "Remove selected database file",
                 path = "keepassvault/unlock_remove-file.yaml"
             ),
             Flow(
                 uid = Uid.flowUid(6),
                 projectUid = PROJECT_UID,
+                groupUid = OTHERS_GROUP_UID,
                 name = "All",
                 path = "keepassvault/all.yaml"
             )

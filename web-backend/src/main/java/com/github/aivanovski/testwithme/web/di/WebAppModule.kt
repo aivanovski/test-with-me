@@ -15,11 +15,14 @@ import com.github.aivanovski.testwithme.data.resources.ResourceProvider
 import com.github.aivanovski.testwithme.web.data.database.FlowRunDao
 import com.github.aivanovski.testwithme.web.domain.usecases.InitializeDefaultDataUseCase
 import com.github.aivanovski.testwithme.web.data.database.FlowDao
+import com.github.aivanovski.testwithme.web.data.database.GroupDao
 import com.github.aivanovski.testwithme.web.data.database.ProjectDao
 import com.github.aivanovski.testwithme.web.data.database.UserDao
 import com.github.aivanovski.testwithme.web.data.file.FlowContentProvider
 import com.github.aivanovski.testwithme.web.data.repository.FlowRunRepository
+import com.github.aivanovski.testwithme.web.data.repository.GroupRepository
 import com.github.aivanovski.testwithme.web.presentation.controller.FlowRunController
+import com.github.aivanovski.testwithme.web.presentation.controller.GroupController
 import com.github.aivanovski.testwithme.web.presentation.controller.UserController
 import org.koin.dsl.module
 
@@ -35,24 +38,27 @@ object WebAppModule {
         single { ProjectDao() }
         single { FlowDao() }
         single { FlowRunDao() }
+        single { GroupDao() }
 
         // Repositories
         single<UserRepository> { UserRepositoryImpl(get()) }
         single<FlowRepository> { FlowRepositoryImpl(get(), get()) }
         single<ProjectRepository> { ProjectRepositoryImpl(get()) }
         single { FlowRunRepository(get(), get()) }
+        single { GroupRepository(get(), get()) }
 
         // UseCases
-        single { InitializeDefaultDataUseCase(get(), get(), get()) }
+        single { InitializeDefaultDataUseCase(get(), get(), get(), get()) }
 
         // Services
         single { AuthService(get()) }
 
         // Controllers
         single { LoginController(get()) }
-        single { FlowController(get(), get(), get()) }
+        single { FlowController(get(), get()) }
         single { ProjectController(get()) }
         single { FlowRunController(get(), get(), get()) }
         single { UserController(get()) }
+        single { GroupController(get()) }
     }
 }
